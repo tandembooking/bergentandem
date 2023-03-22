@@ -71,6 +71,9 @@ namespace TandemBooking.Services
 
         private async Task<JObject> Post(string url, object messageObject)
         {
+            if (!_settings.Enable){
+                return null;
+            }
             var qs = new QueryString();
 
             qs = qs.Add("api_key", _settings.ApiKey);
@@ -109,10 +112,10 @@ namespace TandemBooking.Services
 
         public async Task<string> FormatPhoneNumber(string phoneNumber, string countryCode = "NO")
         {
-            //if (!_settings.Enable)
-            //{
-            //    return phoneNumber;
-            //}
+            if (!_settings.Enable)
+            {
+               return phoneNumber;
+            }
 
             var result = await Post($"{ApiUrl}/number/format/json", new
             {
