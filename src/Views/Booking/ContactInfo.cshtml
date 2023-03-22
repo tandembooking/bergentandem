@@ -1,0 +1,121 @@
+﻿@using TandemBooking.ViewModels.Booking;
+@using TandemBooking.Services;
+
+@model TandemBooking.ViewModels.Booking.BookingViewModel
+@inject ContentService contService;
+@{
+    string lang = ViewContext.RouteData.Values["lang"].ToString();
+    contService.setLanguage(lang);
+}
+
+<div class="details">
+    <strong>
+        @contService.content.booking.contact.header
+    </strong>
+    <div class="form-group" id="primary-passenger-group">
+        <label class="small" for="Name">
+            @contService.content.booking.contact.name.label
+        </label>
+        <div class="row">
+            <div class="col-sm-5">
+                <input type="text" 
+                       class="form-control" 
+                       placeholder=" @contService.content.booking.contact.name.placeholder" 
+                       id="Name" 
+                       name="Name" 
+                       value=""/>
+            </div>
+        </div>
+        <p>
+            <span class="text-danger small field-validation-valid" 
+                  data-valmsg-for="Name" 
+                  data-valmsg-replace="true">
+            </span>
+        </p>
+    </div>
+
+    <div class="form-group">
+        <label class="small" for="PhoneNumber">
+            @contService.content.booking.contact.phone.label
+        </label>
+        <div class="row">
+            <div class="col-sm-5">
+                <input type="tel" 
+                       class="form-control" 
+                       placeholder=" @contService.content.booking.contact.phone.placeholder" 
+                       data-val="true" 
+                       data-val-phone="We need a phone number to contact you about your flight. Please enter valid phone number." 
+                       id="PhoneNumber" 
+                       name="PhoneNumber" v
+                       alue="">
+            </div>
+            <div class="info col-sm-7 small">
+                @contService.content.booking.contact.phone.desc
+            </div>
+        </div>
+        <p>
+            <span class="text-danger small field-validation-valid" data-valmsg-for="PhoneNumber" data-valmsg-replace="true"></span>
+        </p>
+    </div>
+
+    <div class="form-group">
+        <label class="small" for="Email">
+            @contService.content.booking.contact.email.label
+        </label>
+        <div class="row">
+            <div class="col-sm-5">
+                <input type="email" 
+                       class="form-control" 
+                       placeholder=" @contService.content.booking.contact.email.placeholder" 
+                       data-val="true" 
+                       data-val-email="Please enter a valid email address" 
+                       id="Email" 
+                       name="Email" 
+                       value=""/>
+            </div>
+            <p class="info col-sm-7 small">
+                @contService.content.booking.contact.email.desc
+            </p>
+        </div>
+        <p>
+            <span class="text-danger small field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+        </p>
+    </div>
+
+    <div class="form-group">
+        <label for="Comment">
+            @contService.content.booking.contact.message.label
+        </label>
+        <div class="row">
+            <div class="col-sm-5">
+                <textarea class="form-control" 
+                          id="Comment" 
+                          name="Comment">
+                </textarea>    
+            </div>
+            <p class="col-sm-7 small">
+                @contService.content.booking.contact.message.desc
+            </p>
+        </div>
+        <p>
+            <span class="text-danger small field-validation-valid" 
+                  data-valmsg-for="Comment" 
+                  data-valmsg-replace="true"></span>
+        </p>
+    </div>
+    <div class="text-center air-vertical">
+        <button type="submit" name="Action" value="back" class="btn btn-lg btn-action">
+            @contService.content.booking.buttons.back
+        </button>
+        <button type="submit" name="Action" value="confirm" class="btn btn-lg btn-action">
+            @contService.content.booking.buttons.book
+        </button>
+    </div>
+
+
+
+
+
+
+
+</div>

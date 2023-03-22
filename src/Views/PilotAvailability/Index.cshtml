@@ -1,0 +1,279 @@
+    @using System.Security.Claims
+@using TandemBooking.ViewModels
+@using TandemBooking.Services
+@model TandemBooking.ViewModels.PilotAvailabilityViewModel
+
+@{
+    ViewData["Title"] = $"Availability for {Model.Pilot.Name}";
+}
+
+<style>
+    .available {
+        background-color: lightgreen;
+    }
+
+    .unavailable {
+        background-color: lightsalmon;
+    }
+
+    .booked {
+        background-color: lightyellow;
+    }
+
+    .past {
+        opacity: 0.8;
+    }
+
+    .pilot-availability a {
+        color: inherit;
+    }
+</style>
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    Please select the dates you are available for tandem flights. Green means you are available on the selected date, red means unavailable.
+</p>
+
+<div class="row">
+    <div class="col-xs-2">
+        <h2><a href="@Url.Action("Index", new {date = Model.Prev.Date, userId=Model.Pilot.Id})">&lt;</a></h2>
+    </div>
+    <div class="col-xs-8 text-center">
+        <h2>@Model.MonthName</h2>
+    </div>
+    <div class="col-xs-2 text-right">
+        <h2><a href="@Url.Action("Index", new {date = Model.Next.Date, userId=Model.Pilot.Id})">&gt;</a></h2>
+    </div>
+</div>
+
+<table class="table table-bordered pilot-availability" style="width: 100%;display:none; table-layout: fixed;">
+    <tr>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+        <th>Sun</th>
+    </tr>
+    @{
+        int day = 0;
+    }
+    @while (Model.StartDate.AddDays(day) <= Model.EndDate)
+    {
+        <tr>
+            @for (int weekDay = 0; weekDay < 7; weekDay++)
+            {
+                var date = Model.StartDate.AddDays(day);
+                var isAvailable = Model.Availabilities.Any(a => a.Date == date);
+                var timeSlots = Model.Availabilities.Where(a => a.Date == date).OrderBy(a => a.TimeSlot);
+
+                var inPast = date < DateTime.Now.Date;
+
+                <td class="@(isAvailable ? "available" : "unavailable") @(inPast ? "past" : "future")" style="position: relative; height: 50px">
+
+
+
+                    @if (!inPast)
+                    {
+                        var url = Url.Action("SetAvailabilityDay", new { date = date, available = !isAvailable, userId = Model.Pilot.Id });
+
+                        <a style="display: block; width: 100%; height: 100%" href="@url" onclick="postAvailability('@url'); return false">
+                            @date.Day
+                            @timeSlots.Count();
+                        </a>
+
+                    }
+                    else
+                    {
+                        @date.Day
+                    }
+                </td>
+
+                {
+                    day++;
+                }
+            }
+        </tr>
+    }
+</table>
+
+<table class="table table-bordered pilot-availability" style="width: 100%; table-layout: fixed;">
+    <tr>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+        <th>Sun</th>
+    </tr>
+    @{
+        day = 0;
+    }
+    @while (Model.StartDate.AddDays(day) <= Model.EndDate)
+    {
+        <tr>
+
+            @for (int weekDay = 0; weekDay < 7; weekDay++)
+            {
+                var date = Model.StartDate.AddDays(day);
+                var timeSlots = Model.Availabilities.Where(a => a.Date == date).OrderBy(a => a.TimeSlot);
+                var bookingsToday = Model.PilotBookings.Where(a => a.Booking.BookingDate == date).Where(a => !(a.Canceled));
+                var isAvailable = timeSlots.Count() > bookingsToday.Count();
+                var isFree = timeSlots.Any(a => bookingsToday.All(b => b.Booking.TimeSlot != a.TimeSlot)) && isAvailable;
+
+
+
+                var inPast = date < DateTime.Now.Date;
+                var dateJSON = Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(date.ToShortDateString()) as String);
+
+                <td class=" @(inPast ? "past" : "future")" style="position: relative; height: 50px;padding:8px">
+
+                    @if (!inPast)
+                    {
+
+
+                        <div class=" @(!isAvailable? "unavailable" : "") @(isAvailable && !isFree? "booked" : "") @(isFree ? "available" : "")" style="display: block; width: 100%; height: 100%" onclick="toggleAvailabilityDay(this)" data-date="@date.ToShortDateString()" @(isFree ? "data-available='available'" : "")>
+                            <div style="float:right">
+                                @date.Day
+                                <br>
+                                @bookingsToday.Count()
+
+                            </div>
+
+                            @for (int timeslot = 0; timeslot < 5; timeslot++)
+                            {
+
+                                var isSlotAvailable = timeSlots.Any(a => a.TimeSlot == timeslot);
+                                var bookingAtTimeslot = bookingsToday.Where(a => a.Booking.TimeSlot == timeslot);
+                                var isSlotFree = bookingAtTimeslot.Count() == 0 && isSlotAvailable;
+
+                                <div class="timeslot @(!isSlotAvailable ? "unavailable" : "") @(isSlotAvailable &&!isSlotFree? "booked" : "") @(isSlotAvailable && isSlotFree ? "available" : "")" timeslot" style="float:left;margin:3px; border:1px solid #ddd;" onclick="toggleAvailabilityTimeslot(this)" data-date="@date.ToShortDateString()" @(isFree ? "data-available='available'" : "") data-timeslot="@timeslot">
+                                    @timeslot.asTime()
+
+                                </div>
+                            }
+
+                        </div>
+
+                    }
+                    else
+                    {
+                        @date.Day
+                    }
+                </td>
+
+                {
+                    day++;
+                }
+            }
+        </tr>
+    }
+</table>
+<button onclick="sendData()">Save availability!</button>
+
+@section scripts
+    {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    <script>
+    var jsonInput =
+        [];
+    function toggleAvailabilityDay(target)
+    {
+        var date = target.getAttribute("data-date");
+        var isAvailable = !(target.getAttribute("data-available"));
+        console.log(isAvailable);
+        var timeslots = target.getElementsByClassName("timeslot")
+
+
+        for (var i = 0; i < timeslots.length; i++) {
+            timeslot = timeslots[i].getAttribute("data-timeslot");
+            toggleAvailability(date, isAvailable, timeslot);
+            toggleElementProperties(timeslots[i], isAvailable)
+        }
+        toggleElementProperties(target, isAvailable)
+    }
+    function toggleElementProperties(target, isAvailable) {
+
+        target.classList.remove(!isAvailable ? "available" : "unavailable");
+        target.classList.add(isAvailable ? "available" : "unavailable");
+        if (isAvailable) {
+            target.setAttribute("data-available", isAvailable);
+        }
+        else {
+            target.removeAttribute("data-available");
+        }
+
+    }
+    function toggleAvailabilityTimeslot(target)
+    {
+        var date = target.getAttribute("data-date");
+        var isAvailable = !(target.getAttribute("data-available"));
+        var timeSlot = target.getAttribute("data-timeslot");
+
+        toggleAvailability(date, isAvailable, timeSlot);
+        toggleElementProperties(target, isAvailable);
+        return false;
+
+    }
+
+    function toggleAvailability(date, isAvailable, timeSlot) {
+        var availability =
+                {
+                    Date: date,
+                    TimeSlot: timeSlot,
+                    Available: isAvailable,
+                    PilotID: "@Model.Pilot.Id.ToString()"
+                };
+        var foundIndex = jsonInput.findIndex(function (element) {
+            return element.Date === availability.Date && element.TimeSlot === availability.TimeSlot;
+        });
+
+        if (foundIndex >= 0) {
+            jsonInput[foundIndex].Available = availability.Available;
+
+        }
+        else {
+            jsonInput.push(availability);
+        }
+
+
+
+    }
+
+
+    function sendData() {
+
+            $.ajax({
+                type: "POST",
+                url: "/NO/PilotAvailability/SetAvailability",
+                contentType: "application/json",
+                data: JSON.stringify(jsonInput) ,
+                success: function (msg) {
+                    jsonInput = [];
+                    window.location.reload();
+                }
+            });
+
+    }
+    function postAvailability(url) {
+        $.post(url, {}, function () {
+            window.location.reload();
+        });
+    }
+    $(".timeslot").click(function (e) {
+        e.stopPropagation();
+        });
+
+        window.onbeforeunload = confirmExit;
+        function confirmExit() {
+            if (jsonInput.length > 0) {
+                return "New information not saved. Do you wish to leave the page?";
+            }
+        }
+    </script>
+
+}

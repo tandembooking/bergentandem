@@ -1,0 +1,14 @@
+﻿@model TandemBooking.ViewModels.BookingAdmin.PilotSelectorViewModel
+
+<select class="form-control" id="@Model.ControlName" name="@Model.ControlName" placeholder="Select pilot">
+    <option value="">Choose from available pilots</option>
+    @foreach (var pilot in Model.AvailablePilots.OrderByDescending(p => p.Available).ThenBy(p => p.Priority))
+    {
+        <option class="@(pilot.Available ? "available" : "unavailable")" value="@pilot.Pilot.Id">
+            @pilot.Pilot.Name (@pilot.Pilot.PhoneNumber)
+            @(pilot.Available ? "Available" : "Unavailable")
+            Priority @(pilot.Priority)
+            @pilot.Pilot.FormatWeightRange()
+        </option>
+    }
+</select>

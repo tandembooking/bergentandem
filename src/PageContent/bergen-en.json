@@ -1,0 +1,158 @@
+﻿{
+  "clubname": "Bergen Hang and Paragliding Club",
+  "clubnameshort": "BergenHPK",
+  "title": "Bergen Tandemparagliding",
+  "url": "bergentandem.no/en",
+  "header": [
+    {
+
+      "controller": "Booking",
+      "action": "Index",
+      "name": "Booking"
+    },
+    {
+      "controller": "Home",
+      "action": "Faq",
+      "name": "Faq"
+    },
+    {
+      "controller": "Home",
+      "action": "Contact",
+      "name": "Contact us"
+    }
+  ],
+  "front": {
+    "welcome": "Want to fly like a bird?",
+    "text": "Experience tandem paragliding with the pilots from Bergen hang and paragliding club and see Bergen from the air!",
+    "button": "Book your flight here"
+  },
+  "booking": {
+    "confirmation": "Sweet!<br /> We've registered your booking and will contact you as soon as possible to arrage the details of your flight.",
+    "start": "Awesome! We're super excited about showing you Bergen from the air, and what paragliding is all about. Fill out the form below, and one of our pilots will contact you and arrange the details.",
+    "warning": "Please note that paragliding is very dependent on weather. Safety is paramount, and we will only fly if the weather conditions permit it. If the selected day turns out to be unflyable, your pilot will contact you to cancel the flight. You will of course not pay anything if we're unable to fly.",
+    "group": "If you are a group of people wanting to fly together, please use the \"add extra passenger\"-button below and enter their names. That way we can find enough pilots so you can all fly toghether.",
+    "add": "Add Extra Passenger",
+    "name": {
+      "label": "Name of passenger",
+      "placeholder": "Please enter the passenger name"
+    },
+    "weight": {
+      "label": "Weigth of passenger (in kg)",
+      "placeholder": "Please enter the passenger weight"
+    },
+    "details": {
+      "header": "Your flight details",
+      "nop": "Number of passengers:",
+      "date": {
+        "label": "Selected date:",
+        "placeholder": "Date not selected"
+      },
+      "time": {
+        "label": "Selected time:",
+        "placeholder": "Time not selected"
+      },
+      "list": "Passengers:"
+    },
+    "calender": {
+      "header": "When would you like to fly?",
+      "months": [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
+      "days": [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" ],
+      "time": "Select time",
+      "labels": {
+        "available": "Time/date has available pilots",
+        "unavailable": "Currently no pilots at time/date"
+      }
+    },
+    "contact": {
+      "header": "Your contact information",
+      "name": {
+        "label": "Please enter your name",
+        "placeholder": "Please enter your name"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "Please enter a phone number",
+        "desc": "Your pilot will contact you on this phone number in order to arrange the details for your flight. It will not be used for any other purpose"
+
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Please enter an email address",
+        "desc": "An optional email address the pilot can use to send pictures/video of your flight, etc."
+      },
+      "message": {
+        "label": "Message to pilot",
+        "desc": "Extra information you want to share with the pilot, e.g. time constraints or other requirements."
+      }
+    },
+    "buttons": {
+      "start": "Book your flight here",
+      "back": "Go back",
+      "date": "Find date",
+      "book": "Take me flying!"
+    },
+    "info": {
+      "header": "Current prices - No card payments - see FAQ for more information",
+      "price": {
+        "label": "Regular price",
+        "value": 1700
+      },
+      "video": {
+        "label": "Extra for photos/video using the pilots equipment",
+        "value": 200
+
+      },
+      "other": "Regular price does not include the gondola to Ulriken. Out-of-town surcharge is added when flying from places outside the normal starts around Bergen. All prices are in norwegian kroner and are paid via Vipps or directly to the pilot. All prices are in Norwegian Krone (NOK)"
+    }
+  },
+  "FAQ": {
+
+    "questions": [
+      {
+        "Q": "What is tandem paragliding?",
+        "A": "When flying tandem, you are flying with one of the experienced tandem instructors in Bergen hang and paragliding club in a paraglider designed for two persons flying together. It is a wonderful way to safely experience paragliding and see Bergen from the air."
+      },
+      {
+        "Q": "Who can fly?",
+        "A": "To stay within safety margins our pilots have certain weight restrictions. The calendar will show if we have pilots available in your weight category. Additionally, you must be able to do a short sprint. In order to launch the paraglider you and your instructor will be running down a hill as fast as you can."
+      },
+      {
+        "Q": "How much does it cost?",
+        "A": "Standard fee is 1700 NOK. For video/photo using pilots equipment comes an extra 200 NOK. "
+      },
+      {
+        "Q": "Who organizes tandem paragliding?",
+        "A": "In Norway, paragliding is organized through the clubs of the hang and paragliding-section of NLF (the Norwegian aerosports association)."
+      },
+      {
+        "Q": "Am I insured?",
+        "A": "In the extremely unlikely event of an accident, you are covered by the pilots insurance."
+      },
+      {
+        "Q": "What should I wear?",
+        "A": "Sensible shoes and something to keep you warm. You will run to launch the paraglider, so wearing high heels is definitely not recommended. Windproof jacket/pants i also adwiced in standard Bergenweather"
+      },
+      {
+        "Q": "How do I pay?",
+        "A": "Payment is done by cash or the norwegian payment system Vipps at the day of the flight. Unfortunately we are unable to accept credit cards."
+         
+      }
+    ],
+    "other": {
+
+      "Q": "Any other questions?",
+      "link": {
+        "name": "Contact us",
+        "controller": "Home",
+        "action": "Contact"
+      }
+    }
+  },
+  "contact": {
+    "www": "www.bhpk.no",
+    "person": "Tandem Coordinator:",
+    "phone": "+4792819387",
+    "email": "booking@bergentandem.no"
+  }
+
+}

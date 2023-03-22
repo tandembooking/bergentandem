@@ -1,0 +1,49 @@
+@using TandemBooking.Services
+@model TandemBooking.ViewModels.BookingAdmin.CompleteBookingViewModel
+@{
+    ViewData["Title"] = "Complete Booking";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row">
+    <div class="col-sm-12">
+        <section>
+            <div class="col-sm-12">
+                <p></p>
+
+                <form asp-controller="BookingAdmin" asp-action="Complete" method="post" role="form" onsubmit="return submitComplete()">
+                    <input type="hidden" name="Id" value="@Model.Booking.Id"/>
+
+                    <p>
+                        Make sure that passenger fee matches the fee the passenger paid for the flight. Payment should be made to the dedicated pilot account. Either through Vipps or bank transfer by pilot, if the passenger is unable to use Vipps.
+                    </p>
+
+                    <div class="form-group">
+                        <label asp-for="PassengerFee" class="col-md-2 control-label">Passenger fee</label>
+                        <div class="col-md-10">
+                            <input asp-for="PassengerFee" class="form-control" />
+                            <span asp-validation-for="PassengerFee" class="text-danger" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Complete Booking</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+        <div>
+            <a href="@Url.Action("Details", new { id = Model.Booking.Id })">Back to Booking Details</a>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        function submitComplete() {
+            return confirm("Mark booking as completed?");
+        }
+    </script>
+}

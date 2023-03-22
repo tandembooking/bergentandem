@@ -1,0 +1,28 @@
+@using TandemBooking.Services;
+@inject ContentService contService;
+@{
+    string lang = ViewContext.RouteData.Values["lang"].ToString();
+    contService.setLanguage(lang);
+}
+
+@{
+    ViewData["Title"] = "Contact";
+    ViewData["CssClass"] = "contact";
+}
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    @contService.content.clubname<br />
+    <a href="@contService.content.contact.www">@contService.content.contact.www</a><br />
+</p>
+
+<p>
+    <strong>@contService.content.contact.person</strong><br />
+    Phone: <a href="tel:@contService.content.contact.phone">@contService.content.contact.phone</a><br />
+    Email: <a href="mailto:@(contService.content.contact.email)">@contService.content.contact.email</a>
+</p>
+<p class="air-vertical">
+    <a href="http://@(contService.content.contact.www)" title="@contService.content.contact.clubname">
+        <img src="~/images/logo.png" />
+    </a>
+</p>

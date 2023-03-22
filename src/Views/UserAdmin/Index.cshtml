@@ -1,0 +1,38 @@
+@using TandemBooking.Services
+@model List<ApplicationUser>
+
+@{
+    ViewData["Title"] = "Pilots";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Tandem Pilot</th>
+        <th>Admin</th>
+        <th></th>
+    </tr>
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Name</td>
+            <td>@user.Email</td>
+            <td>@user.PhoneNumber</td>
+            <td>@(user.IsPilot ? "Yes" : "No")</td>
+            <td>@(user.IsAdmin ? "Yes" : "No")</td>
+            <td>
+                @if (User.IsAdmin())
+                {
+                    <a href="@Url.Action("EditUser", new {id = user.Id})" class="btn btn-default">Edit</a>
+                    <a href="@Url.Action("Index", "PilotAvailability", new {userId = user.Id})" class="btn btn-default">Availability</a>
+                }
+                <a href="@Url.Action("Index", "BookingAdmin", new {userId = user.Id})" class="btn btn-default">Bookings</a>
+                <a href="@Url.Action("CompletedBookings", "Report", new {pilotId = user.Id})" class="btn btn-default">Completed bookings</a>
+            </td>
+        </tr>
+    }
+</table>

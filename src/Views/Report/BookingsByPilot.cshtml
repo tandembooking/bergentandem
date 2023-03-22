@@ -1,0 +1,42 @@
+﻿@model BookingsByPilotViewModel
+@{
+    ViewData["Title"] = $"Paid flights per pilot {DateTime.Now.Year}";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row">
+    <div class="col-xs-2">
+        <h2><a href="@Url.Action("BookingsByPilot", new {year = Model.Year - 1})">&lt;</a></h2>
+    </div>
+    <div class="col-xs-8 text-center">
+        <h2>@Model.Year</h2>
+    </div>
+    <div class="col-xs-2 text-right">
+        <h2><a href="@Url.Action("BookingsByPilot", new {year = Model.Year + 1})">&gt;</a></h2>
+    </div>
+</div>
+
+<table class="table">
+    <tr>
+        <th>Pilot</th>
+        <th>Completed Flights</th>
+        <th>Missing Status</th>
+        <th>Total</th>
+    </tr>
+    @foreach (var row in Model.PilotStats)
+    {
+        <tr>
+            <td>@row.PilotName</td>
+            <td>@row.CompletedFlights</td>
+            <td>@row.FlightsMissingStatus</td>
+            <td>@(row.FlightsMissingStatus + row.CompletedFlights)</td>
+        </tr>
+    }
+    <tr>
+        <th>Total</th>
+        <th>@Model.PilotStats.Sum(row => row.CompletedFlights)</th>
+        <th>@Model.PilotStats.Sum(row => row.FlightsMissingStatus)</th>
+        <th>@Model.PilotStats.Sum(row => row.FlightsMissingStatus + row.CompletedFlights)</th>
+    </tr>
+</table>

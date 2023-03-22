@@ -1,0 +1,170 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@using TandemBooking.Services
+@model TandemBooking.ViewModels.BookingAdmin.CreateBookingViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create new booking</h2>
+
+@if (Model.PrimaryBookingId == null)
+{
+    <p>
+        Create a new booking. Use this if you have taken a flight which did not
+        originate in the booking system (e.g. direct booking on the day), or you have a good reason
+        for not using the completely-fair-pilot-assignment-system (tm).
+    </p>
+}
+else
+{
+    <p>
+        Clone an existing booking. Use this if the original booking was for multiple people, and
+        you want to create another booking with the original as primary booking, e.g. additional passengers
+        want to join in on an existing booking.
+    </p>
+}
+
+<form asp-action="Create">
+
+    <div class="form-horizontal">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Date" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <div id="datepicker" class="input-width" data-date='@Model.Date?.ToString("MM/dd/yyyy")'></div>
+                <input type="hidden" asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="TimeSlot" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                
+             
+                <select asp-for="TimeSlot" class="form-control">
+                @for (int timeslot = 0; timeslot < 5; timeslot++)
+                {
+                    <option value="@timeslot">@timeslot.asTime()</option>
+
+                }
+                </select>
+             
+                <span asp-validation-for="TimeSlot" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PilotId" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <div id="pilot-selector">
+                    @await Component.InvokeAsync("PilotSelector", new { date = @Model.Date, controlName = "PilotId" })
+                </div>
+                <span asp-validation-for="PilotId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Name" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Weight" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Weight" class="form-control" />
+                <span asp-validation-for="Weight" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PhoneNumber" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PassengerFee" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="PassengerFee" class="form-control" />
+                <span asp-validation-for="PassengerFee" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Comment" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <textarea asp-for="Comment" class="form-control"></textarea>
+                <span asp-validation-for="Comment" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <div class="checkbox">
+                    <input asp-for="NotifyPassenger" />
+                    <label asp-for="NotifyPassenger"></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <div class="checkbox">
+                    <input asp-for="NotifyPilot" />
+                    <label asp-for="NotifyPilot"></label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" asp-for="PrimaryBookingId" />
+
+</form>
+
+<div>
+    @if (Model.PrimaryBookingId != null)
+    {
+        <a href="@Url.Action("Details", new { id = Model.PrimaryBookingId })">Back to Booking Details</a>
+    }
+    else
+    {
+        <a asp-action="Index">Back to List</a>
+    }
+</div>
+
+@section scripts
+{
+    <script>
+        $('#datepicker').datepicker({
+            format: "mm/dd/yyyy",
+            maxViewMode: 2
+        });
+        $('#datepicker').on("changeDate", function () {
+            $('#Date').val(
+                $('#datepicker').datepicker('getFormattedDate')
+            );
+        });
+    </script>
+}

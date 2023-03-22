@@ -1,0 +1,24 @@
+@using TandemBooking.Services;
+@inject ContentService contService;
+@{
+    string lang = ViewContext.RouteData.Values["lang"].ToString();
+    contService.setLanguage(lang);
+}
+@{
+    ViewData["Title"] = "Frequently Asked Questions";
+}
+<h2>@ViewData["Title"]</h2>
+
+@foreach (var faq in contService.content.FAQ.questions)
+{
+    <div class="faq-wrap">
+        <div class="faq-inner">
+            <label>@faq.Q</label>
+            <p>@faq.A</p>
+        </div>
+    </div>
+}
+<div class="air-vertical">
+    <label>@contService.content.FAQ.other.Q</label>
+    <p><a asp-controller="@contService.content.FAQ.other.link.controller" asp-action="@contService.content.FAQ.other.link.action" class="btn btn-action">@contService.content.FAQ.other.link.name</a></p>
+</div>

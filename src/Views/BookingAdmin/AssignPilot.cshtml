@@ -1,0 +1,75 @@
+@using TandemBooking.Services
+@model TandemBooking.ViewModels.BookingAdmin.BookingAssignPilotViewModel
+@{
+    ViewData["Title"] = "Assign new pilot";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <section>
+            <div class="col-sm-12">
+                <p>If the currently assign pilot is unable to make the flight, use this to find a new pilot from the available pilots to take the flight. A message is sent to the passenger notifying him of the new pilot. If no other pilots are available, the tandem coordinator is notified and tasked with finding a new pilot.</p>
+                <form asp-controller="BookingAdmin" asp-action="AssignPilot" method="post" role="form" onsubmit="return submitNewPilot()">
+                    <input type="hidden" name="Id" value="@Model.Booking.Id"/>
+                    <div class="form-group">
+                        <textarea class="form-control" id="NewPilotMessage" name="NewPilotMessage" placeholder="Please enter a reason to assign a new pilot"></textarea>
+                    </div>
+
+                    <p>
+                        Select "Choose from available pilots" to make a fair selection of pilot based on priority. If no pilots are available, you can use this dropdown to select a pilot not marked as available (Remember to verify that the pilot can actually make the flight first).
+                    </p>
+                    <div class="form-group">
+                        <select class="form-control" id="NewPilotUserId" name="NewPilotUserId" placeholder="Please enter a reason to assign a new pilot">
+                            <option value="">Choose from available pilots</option>
+                            @foreach (var pilot in Model.AvailablePilots.OrderByDescending(p => p.Available).ThenBy(p => p.Priority))
+                            {
+                                <option class="@(pilot.Available ? "available" : "unavailable")" value="@pilot.Pilot.Id">
+                                    @pilot.Pilot.Name (@pilot.Pilot.PhoneNumber.AsPhoneNumber())
+                                    @pilot.Pilot.FormatWeightRange()
+                                    @(pilot.Available ? "Available" : "Unavailable"),
+                                    Priority @(pilot.Priority)
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <p>
+                        You can uncheck the "send message to passenger" checkbox if you are changing the pilot after the flight was performed in order to make the booking reflect reality (i.e. another pilot got the flight in the end). 
+                    </p>
+                    <div class="form-group">
+                        <div class="checkbox checkbox-inline">
+                            <input type="checkbox" name="NewPilotNotifyPassenger" id="NewPilotNotifyPassenger" value="true" checked="checked" />
+                            <label class="control-label" for="NewPilotNotifyPassenger">
+                                Send message to passenger via SMS
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-info">Assign new pilot</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <div>
+            <a href="@Url.Action("Details", new { id = Model.Booking.Id })">Back to Booking Details</a>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        function submitNewPilot() {
+            return confirm("Unassign the current pilot and find a new one?")
+        }
+    </script>
+}

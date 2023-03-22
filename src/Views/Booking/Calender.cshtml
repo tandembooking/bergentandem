@@ -1,0 +1,286 @@
+﻿@using TandemBooking.ViewModels.Booking;
+@using TandemBooking.Services;
+
+@model TandemBooking.ViewModels.Booking.BookingViewModel
+@inject ContentService contService;
+@{
+    string lang = ViewContext.RouteData.Values["lang"].ToString();
+    contService.setLanguage(lang);
+}
+<style>
+    .time-slots {
+        display: block;
+    }
+
+    .date-wrap {
+        border-radius: 5px;
+        border-width: 3px;
+        margin: 5px;
+        border-width: 3px;
+        border-style: solid;
+        border-color: rgba(244, 244, 244, 0.36);
+    }
+
+    .date-button {
+        background-color: transparent;
+        background-repeat: no-repeat;
+        border: 4px;
+        cursor: pointer;
+        overflow: hidden;
+        outline: none;
+        height: 50px;
+        width: calc(100%);
+    }
+
+    .month-button {
+        background-color: transparent;
+        cursor: pointer;
+        border: none;
+        outline: none;
+    }
+
+    .date-free {
+        background-color: rgba(88, 241, 39, 0.89);
+        outline: thin;
+    }
+
+    .date-past {
+        background-color: rgba(162, 162, 166, 0.50);
+    }
+
+    .date-available {
+        background-color: rgba(212, 249, 46, 0.89);
+    }
+
+    .date-unavailable {
+        background-color: rgba(239, 239, 239, 0.89);
+    }
+
+    .highlight {
+        border-width: 3px;
+        border-style: solid;
+        border-color: rgba(33, 226, 226, 0.89);
+    }
+
+    #contact-info {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        -ms-transform: translate(-50%,-50%);
+        margin-right: auto;
+        margin-left: auto;
+        background-color: #333;
+    }
+
+    #overlay {
+        position: fixed; /* Sit on top of the page content */
+        display: block; /* Hidden by default */
+        width: 100%; /* Full width (cover the whole page) */
+        height: 100%; /* Full height (cover the whole page) */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+        z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+        cursor: pointer; /* Add a pointer on hover */
+    }
+</style>
+<div class="row">
+    <div class="col-xs-2">
+        <button class="month-button" type="submit" name="Action" value="calender_prev_month"><h2>&lt;</h2</button>
+    </div>
+    <div class="col-xs-8 text-center">
+        <h2>
+            @Model.Calender.MonthName
+        </h2>
+    </div>
+    <div class="col-xs-2 text-right">        
+        <button class="month-button" type="submit" name="Action" value="calender_next_month"><h2>&gt;</h2></button>
+    </div>
+</div>
+
+<table id="bookingcalender" 
+       class="table table-bordered pilot-availability" 
+       style="width: 100%; table-layout: fixed;">
+    <tr>
+        @foreach (var day in contService.content.booking.calender.days)
+        {
+            <th>@day</th>
+        }
+    </tr>
+    @{
+        int dayIndex = 0;
+    }
+    @while (dayIndex < Model.Calender.Days.Count)
+    {
+    <tr>
+        @for (int weekDay = 0; weekDay < 7 && dayIndex < Model.Calender.Days.Count; weekDay++)
+            {
+                var dayInfo = Model.Calender.Days[dayIndex];
+                int totalFree = 0;
+                int maxFree = 0;
+                int maxFreeTimeSlot = -1;
+        @foreach (var timeslot in dayInfo.TimeSlots)
+                {
+                    if (timeslot.FreePilots.Count > maxFree)
+                    {
+                        maxFree = timeslot.PossibleNow;
+                        maxFreeTimeSlot = timeslot.TimeSlot;
+
+                    }
+                    totalFree += timeslot.FreePilots.Count;
+                }
+                bool available = maxFree >= Model.AdditionalPassengers.Length;
+
+        <text>
+        <td class="" style="position: relative; height: 30px;width:30px; padding:0px; border:0px" align="center">
+
+                <div class="day date-wrap @(available ? "date-free" : "date-unavailable")" 
+                     height="100%" 
+                     data-maxflow="@maxFree">
+
+                    <div style="display:none" id="@dayIndex">
+                        @foreach (var timeslot in dayInfo.TimeSlots)  {
+                        <div style="display:none"
+                             data-timeslot="@timeslot.TimeSlot"
+                             data-freepilots="@timeslot.PossibleNow"
+                             data-availablepilots="@timeslot.PossibleNow">
+                        </div>
+                }
+                    </div>
+                    <button class="date-button" 
+                            type="button" 
+                            name="Action" 
+                            value="@dayInfo.Date.ToShortDateString()" 
+                            onclick="show_times(@dayIndex)">
+                        @dayInfo.Date.Day
+                    </button>
+                </div>
+
+
+         </td>
+            
+        </text>
+                dayIndex++;
+            }
+
+    </tr>
+    }
+</table>
+
+
+<div id="timeslots-marker"></div>
+<template id="time-picker">
+
+    <div class="timeslots text-center air-vertical">
+        Velg klokkeslett
+        <br>
+        <button type="button" class="btn class:0" id="timeslot:0" onclick="select_slot(0)">10:00</button>
+        <button type="button" class="btn class:1" id="timeslot:1" onclick="select_slot(1)">12:00</button>
+        <button type="button" class="btn class:2" id="timeslot:2" onclick="select_slot(2)">14:00</button>
+        <button type="button" class="btn class:3" id="timeslot:3" onclick="select_slot(3)">16:00</button>
+        <button type="button" class="btn class:4" id="timeslot:4" onclick="select_slot(4)">18:00</button>
+
+
+    </div>
+
+</template>
+
+<div>
+    <div class="text-center air-vertical">
+        <button type="submit" name="Action" value="back" class="btn btn-lg btn-action">
+            @contService.content.booking.buttons.back
+        </button>
+        <button type="submit" class="btn btn-lg btn-action">
+            @contService.content.booking.buttons.book
+        </button>
+    </div>
+</div>
+
+
+<script>
+
+    var timeslotTemplate = document.getElementById("time-picker");
+    var timeslotsMarker = document.getElementById("timeslots-marker");
+
+    var asTime = ["10:00", "12:00", "14:00", "16:00", "18:00"];
+
+    function show_times(inputID) {
+
+        var dayElements = document.getElementById("bookingcalender").getElementsByClassName("day");
+
+        for (var i = 0; i < dayElements.length; i++) {
+            dayElements[i].classList.remove("highlight");
+        }
+        var date = event.target.value;
+        document.getElementById("booking-date").value = date;
+        document.getElementById("selected-date").innerHTML = date;
+
+        var nrOfPassengers = document.getElementsByClassName("additional-passenger").length;
+        var dataElements = document.getElementById(inputID).getElementsByTagName("div");
+
+
+        event.target.parentElement.classList.add("highlight");
+        var timeslotHtml = $(timeslotTemplate).html();
+
+
+        for (var i = 0; i < dataElements.length; i++) {
+            var color = "date-unavailable";
+            if (Number(dataElements[i].getAttribute("data-freepilots")) >= nrOfPassengers) {
+                color = "date-free";
+            }
+            var replaceValue = "class:" + i.toString();
+            console.log(replaceValue);
+            console.log(Number(dataElements[i].getAttribute("data-freepilots")));
+            console.log(nrOfPassengers)
+            timeslotHtml = timeslotHtml.replace(replaceValue, color);
+
+        }
+        timeslotsMarker.innerHTML = timeslotHtml;
+
+
+    }
+
+    function updateCalender() {
+
+        var nrOfPassengers = document.getElementsByClassName("additional-passenger").length + 1;
+        var dayElements = document.getElementById("bookingcalender").getElementsByClassName("day");
+        console.log(dayElements.length)
+        for (var i = 0; i < dayElements.length; i++) {
+            var dataElements = dayElements[i].getElementsByTagName("div");
+            for (var j = 0; j < dataElements.length; j++) {
+
+                if (Number(dataElements[j].getAttribute("data-freepilots")) >= nrOfPassengers) {
+                    color = "#00ff21"
+                }
+                else if (Number(dataElements[j].getAttribute("data-availablepilots")) >= nrOfPassengers) {
+                    color = "#ffd800"
+                }
+                else {
+                    color = "#eeeeee";
+
+                }
+                dayElements[i].style.backgroundColor = color;
+            }
+        }
+        document.getElementById("booking-timeslot").value = "-1";
+    }
+
+
+    function select_slot(slot) {
+        var timeslotElements = event.target.parentElement.getElementsByClassName("btn");
+        for (var i = 0; i < timeslotElements.length; i++) {
+
+            timeslotElements[i].classList.remove("highlight");
+
+        }
+        event.target.classList.add("highlight");
+
+        document.getElementById("booking-timeslot").value = slot;
+        document.getElementById("selected-time").innerHTML = asTime[slot].toString();
+    }
+
+</script>
+

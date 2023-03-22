@@ -1,0 +1,18 @@
+@using TandemBooking.Services;
+@inject ContentService contService;
+@{
+    string lang = ViewContext.RouteData.Values["lang"].ToString();
+    contService.setLanguage(lang);
+}
+@{
+    ViewData["Title"] = "Booking completed";
+}
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    @contService.content.booking.confirmation;
+</p>
+
+@section scripts
+    {
+}

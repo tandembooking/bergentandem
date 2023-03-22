@@ -1,0 +1,187 @@
+﻿@using TandemBooking.ViewModels.Booking;
+@using TandemBooking.Services;
+
+@model TandemBooking.ViewModels.Booking.BookingViewModel
+@inject ContentService contService;
+@{
+    string lang = ViewContext.RouteData.Values["lang"].ToString();
+    contService.setLanguage(lang);
+}
+
+<div class="details">
+
+
+
+
+    @if (Model.Stage == 0)
+    {
+        var currentAdditionalPassengerIndex = 2;
+        <div id="passengerInformation">
+            <div class="additional-passenger">
+                <input type="hidden" name="AdditionalPassengers.Index" value="1" />
+
+                <div class="form-group">
+                    <label class="small">
+                        @contService.content.booking.name.label
+                    </label>
+                    <div class="row">
+                        <div class="col-sm-5 col-xs-8">
+                            <input type="text"
+                                   name="AdditionalPassengers[1].Name"
+                                   class="form-control"
+                                   placeholder="@contService.content.booking.name.placeholder"
+                                   value="@Model.AdditionalPassengers?[0].Name" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="small">
+                        @contService.content.booking.weight.label
+                    </label>
+                    <div class="row">
+                        <div class="col-sm-5 col-xs-8">
+                            <input type="text"
+                                   name="AdditionalPassengers[1].Weight"
+                                   class="form-control"
+                                   placeholder="@contService.content.booking.weight.placeholder"
+                                   value="@Model.AdditionalPassengers?[0].Weight" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="small">
+                @contService.content.booking.group
+            </p>
+
+            @foreach (var additionalPassenger in (Model.AdditionalPassengers != null ?
+               Model.AdditionalPassengers.Skip(1) : new AdditionalPassengerViewModel[] { }))
+            {
+                <div class="additional-passenger">
+                    <input type="hidden" name="AdditionalPassengers.Index" value="@currentAdditionalPassengerIndex" />
+
+                    <div class="form-group">
+                        <label class="small">
+                            @contService.content.booking.name.label
+                        </label>
+                        <div class="row">
+                            <div class="col-sm-5 col-xs-8">
+                                <input type="text"
+                                       name="AdditionalPassengers[@currentAdditionalPassengerIndex].Name"
+                                       class="form-control"
+                                       placeholder="@contService.content.booking.name.placeholder"
+                                       value="@additionalPassenger.Name" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="small">
+                            @contService.content.booking.weight.label
+                        </label>
+                        <div class="row">
+                            <div class="col-sm-5 col-xs-8">
+                                <input type="text"
+                                       name="AdditionalPassengers[@currentAdditionalPassengerIndex].Weight"
+                                       class="form-control" placeholder="@contService.content.booking.weight.placeholder"
+                                       value="@additionalPassenger.Weight" />
+                            </div>
+                            <div class="info col-sm-7 col-xs-4">
+                                <button class="btn remove-passenger-button" type="button">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {
+                    currentAdditionalPassengerIndex++;
+                }
+            }
+            <template id="add-passenger-marker">
+            </template>
+
+            <div class="form-group">
+                <p>
+                    <span asp-validation-for="AdditionalPassengers" class="text-danger small"></span>
+                </p>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button class="btn btn-secondary" type="button" id="add-passenger-button">
+                            @contService.content.booking.add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center air-vertical">
+                <button type="submit" class="btn btn-lg btn-action">
+                    @contService.content.booking.buttons.date
+
+                </button>
+            </div>
+
+            </div>
+            }
+            else
+            {
+            var currentAdditionalPassengerIndex = 1;
+            @* add additional passengers on a postback with invalid model *@
+            <div id="passengerInformation">
+
+                <strong>@contService.content.booking.details.header</strong>
+                <p>
+                    @contService.content.booking.details.nop <label>@Model.AdditionalPassengers.Length</label>
+                    <br>
+                    @contService.content.booking.details.date.label
+                    <label id="selected-date">
+                        @( Model.Date != null ? Model.Date.GetValueOrDefault().ToShortDateString() :
+                                        @contService.content.booking.details.date.placeholder)
+                    </label>
+                    <br>
+                    @contService.content.booking.details.time.label
+                    <label id="selected-time">
+                        @(Model.TimeSlot != null ? Model.TimeSlot.GetValueOrDefault().asTime() :
+                                        @contService.content.booking.details.time.placeholder)
+                    </label>
+
+                </p>
+                <label class="small">
+                    Passasjerer:
+                </label>
+
+
+                @foreach (var additionalPassenger in Model.AdditionalPassengers ?? new AdditionalPassengerViewModel[] { })
+                {
+                    <div class="additional-passenger">
+                        <input type="hidden" name="AdditionalPassengers.Index" value="@currentAdditionalPassengerIndex">
+
+                        <div class="row">
+                            <div class="col-sm-8 col-xs-8">
+                                @additionalPassenger.Name
+                                (@additionalPassenger.Weight kg)
+                                <input type="hidden"
+                                       name="AdditionalPassengers[@currentAdditionalPassengerIndex].Name"
+                                       class="form-control"
+                                       value="@additionalPassenger.Name">
+                                <input type="hidden"
+                                       name="AdditionalPassengers[@currentAdditionalPassengerIndex].Weight"
+                                       class="form-control"
+                                       value="@additionalPassenger.Weight">
+                            </div>
+                        </div>
+                        @{
+                        currentAdditionalPassengerIndex++;
+                        }
+                    </div>
+                }
+            </div>
+
+
+            }
+
+        </div>
+
+

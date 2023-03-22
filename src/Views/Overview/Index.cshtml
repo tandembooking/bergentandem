@@ -1,0 +1,181 @@
+﻿@using TandemBooking.Services
+@model TandemBooking.Models.OverviewViewModel
+@{
+    ViewData["Title"] = $"Booking Overview";
+}
+
+<div class="clearfix">
+    <ul class="nav navbar-nav">
+        <li class=""><a href="@Url.Action("Create", "BookingAdmin")">New Booking</a></li>
+        <li><a href="@Url.Action("Index", "BookingAdmin")">All Bookings</a></li>
+        <li><a href="@Url.Action("MyCompletedBookings", "Report")">My bookings</a></li>
+        @if (User.IsAdmin())
+        {
+            <li><a href="@Url.Action("CompletedBookings", "Report")">All Completed bookings</a></li>
+            <li><a href="@Url.Action("BookingsByPilot", "Report")">Completed bookings per pilot</a></li>
+        }
+    </ul>
+</div>
+
+@if (Model.MissingPilotBookings != null)
+{
+    <h2>Bookings Without Pilot</h2>
+
+    @if (Model.MissingPilotBookings.Count() > 0) 
+    {
+        DateTime current_date = new DateTime();
+
+    <table class="table">
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Passenger</th>
+            <th>Weight</th>
+        </tr>
+        @foreach (var booking in Model.MissingPilotBookings)
+        {
+            if (booking.BookingDate != current_date)
+            {
+                current_date = booking.BookingDate;
+        <tr class="active">
+            <td>@booking.BookingDate.ToString("dd.MM.yyyy")</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            @{ 
+                int count_others = Model.CorrespondingBookings
+                .Where(b => b.BookingDate == booking.BookingDate)
+                .Count();
+                if (count_others > 0)
+                {
+                    <td class="text-right"><button class="btn btn-default" onclick="show_other_flights('@current_date.ToString("ddMMyyyy")')">Other flights</button></td>
+                }
+                else { <td></td>}
+            }
+        </tr>
+                foreach (var other_booking in Model.CorrespondingBookings
+                    .Where(b => b.BookingDate == booking.BookingDate)
+                    .OrderBy(b => b.TimeSlot)
+                        .ToList())
+                    {
+                        <tr class="hidden active @current_date.ToString("ddMMyyyy")">
+                            <td></td>
+                            <td>@other_booking.TimeSlot.asTime()</td>
+                            <td>@other_booking.AssignedPilot?.Name</td>
+                            <td>@other_booking.PassengerWeight.AsWeight()</td>
+
+                            <td class="text-right">
+                                <a href="@Url.Action("Details", "BookingAdmin" , new { id=other_booking.Id })" class="btn btn-default">Details</a>
+
+                            </td>
+
+                        </tr>
+                    }
+                }
+            <tr>
+
+                <td></td>
+                <td>@booking.TimeSlot.asTime()</td>
+                <td>
+                    @booking.PassengerName
+                </td>
+                <td>
+                    @booking.PassengerWeight.AsWeight()
+                </td>
+                <td class="text-right">
+                    <a href="@Url.Action("Details", "BookingAdmin" , new { id=booking.Id })" class="btn btn-default">Details</a>
+                </td>
+            </tr>
+            
+                
+            
+        }
+    </table>
+    }
+    else 
+    {
+        <p>No upcoming bookings without pilots</p>
+    }
+}
+
+@if (Model.UpcomingBookings != null)
+{
+    <h2>My Upcoming Bookings</h2>
+
+    @if (Model.UpcomingBookings.Count() > 0)
+    {
+        <table class="table">
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Passenger</th>
+                <th></th>
+            </tr>
+            @foreach (var booking in Model.UpcomingBookings)
+            {
+            <tr>
+                <td>@booking.BookingDate.ToString("dd.MM.yyyy")</td>
+                <td>@booking.TimeSlot.asTime()</td>
+                <td>@booking.PassengerName</td>
+                <td class="text-right">
+                    <a href="@Url.Action("Details", "BookingAdmin", new { id = booking.Id })" class="btn btn-default">Details</a>
+                    @if (!booking.Canceled && !booking.Completed)
+        {
+            <a href="@Url.Action("Cancel", "BookingAdmin", new { id = booking.Id })" class="btn btn-danger">Cancel</a>
+}
+                </td>
+            </tr>
+            }
+        </table>
+    }
+    else
+    {
+        <p>You do not have any upcoming bookings</p>
+    }
+}
+
+@if (Model.RecentBookings != null)
+{
+    <h2>My Recent Bookings</h2>
+
+    @if (Model.RecentBookings.Count() > 0)
+    {
+        <table class="table">
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Passenger</th>
+                <th></th>
+            </tr>
+            @foreach (var booking in Model.RecentBookings)
+            {
+            <tr>
+                <td>@booking.BookingDate.ToString("dd.MM.yyyy")</td>
+                <td>@booking.TimeSlot.asTime()</td>
+                <td>@booking.PassengerName</td>
+                <td class="text-right">
+                    <a href="@Url.Action("Details", "BookingAdmin", new { id = booking.Id })" class="btn btn-sm btn-default">Details</a>
+                    @if (!booking.Canceled && !booking.Completed)
+        {
+            <a href="@Url.Action("Cancel", "BookingAdmin", new { id = booking.Id })" class="btn btn-sm btn-danger">Cancel</a>
+            <a href="@Url.Action("Complete", "BookingAdmin", new { id = booking.Id })" class="btn btn-sm btn-success">Complete</a>
+}
+                </td>
+            </tr>
+            }
+        </table>
+    }
+    else
+    {
+        <p>No recent bookings found</p>
+    }
+}
+
+<script>
+    function show_other_flights(id) {
+        var other_flights = document.getElementsByClassName(id);
+        for (var i = 0; i < other_flights.length; i++) {
+            other_flights[i].classList.toggle("hidden");
+        }
+    }
+</script>

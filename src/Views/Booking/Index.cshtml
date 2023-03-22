@@ -1,0 +1,235 @@
+@using TandemBooking.ViewModels.Booking;
+@using TandemBooking.Services;
+
+
+@model TandemBooking.ViewModels.Booking.BookingViewModel
+@inject ContentService contService;
+@{
+    string lang = ViewContext.RouteData.Values["lang"].ToString();
+    contService.setLanguage(lang);
+}
+<style>
+    .time-slots {
+        display: block;
+    }
+
+    .date-wrap {
+        border-radius: 5px;
+        border-width: 3px;
+        margin: 5px;
+        border-width: 3px;
+        border-style: solid;
+        border-color: rgba(244, 244, 244, 0.36);
+    }
+
+    .date-button {
+        background-color: transparent;
+        background-repeat: no-repeat;
+        border: 4px;
+        cursor: pointer;
+        overflow: hidden;
+        outline: none;
+        height: 50px;
+        width: calc(100%);
+    }
+
+    .month-button {
+        background-color: transparent;
+        cursor: pointer;
+        border: none;
+        outline: none;
+    }
+
+    .date-free {
+        background-color: rgba(88, 241, 39, 0.89);
+        outline: thin;
+    }
+
+    .date-past {
+        background-color: rgba(162, 162, 166, 0.50);
+    }
+
+    .date-available {
+        background-color: rgba(212, 249, 46, 0.89);
+    }
+
+    .date-unavailable {
+        background-color: rgba(239, 239, 239, 0.89);
+    }
+
+    .highlight {
+        border-width: 3px;
+        border-style: solid;
+        border-color: rgba(33, 226, 226, 0.89);
+    }
+
+    #contact-info {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        -ms-transform: translate(-50%,-50%);
+        margin-right: auto;
+        margin-left: auto;
+        background-color: #333;
+    }
+
+    #overlay {
+        position: fixed; /* Sit on top of the page content */
+        display: block; /* Hidden by default */
+        width: 100%; /* Full width (cover the whole page) */
+        height: 100%; /* Full height (cover the whole page) */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+        z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+        cursor: pointer; /* Add a pointer on hover */
+    }
+</style>
+@{
+    ViewData["Title"] = "Booking";
+    ViewData["CssClass"] = "booking";
+}
+<h2>@ViewData["Title"]</h2>
+
+<p class="readwrap">
+    @contService.content.booking.start;
+
+</p>
+
+@* All of this instead of @Html.ValidationSummary(false) due to a bug in ASP.NET Core 1.0 (probably fixed in 1.1) *@
+@if (!@ViewData.ModelState.IsValid)
+{
+    var errors = ViewData.ModelState.Values.Select(item => item.Errors.FirstOrDefault()?.ErrorMessage).Where(item => item != null);
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in errors)
+            {
+
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
+
+<form id="BookingForm" asp-controller="Booking" asp-action="Index" method="post"  onSubmit="@(Model.Stage == 2 ? "return confirm('Remember to read the FAQ')" : "")">
+    @* add additional passengers on a postback with invalid model *@
+
+    @{
+        Html.RenderPartial("PassengerInfo", Model);
+    }
+    @if (Model.Stage == 0)
+    {
+        <input id="booking-stage" type="hidden" asp-for="Stage" value="1" />
+    }
+
+    @if (Model.Stage == 1)
+    {
+        Html.RenderPartial("Calender", Model);
+        <input id="booking-stage" type="hidden" asp-for="Stage" value="2" />
+    }
+    @if (Model.Stage == 2)
+    {
+        Html.RenderPartial("ContactInfo", Model);
+        <input id="booking-stage" type="hidden" asp-for="Stage" value="3" />
+    }
+
+    <div class="info-text air-vertical">
+        @contService.content.booking.warning;
+    </div>
+
+
+    <p class="readwrap">
+        <strong> @contService.content.booking.info.header</strong>
+        <table class="table">
+            <tr>
+                <td>@contService.content.booking.info.price.label</td>
+                <td class="text-right">@(contService.content.booking.info.price.value),-</td>
+            </tr>
+            <tr>
+                <td>@contService.content.booking.info.video.label</td>
+                <td class="text-right">@(contService.content.booking.info.video.value),-</td>
+            </tr>
+        </table>
+        @contService.content.booking.info.other
+    </p>
+
+    <input id="booking-nextdate" type="hidden" asp-for="NextDate" value="@Model.NextDate" />
+    <input id="booking-prevdate" type="hidden" asp-for="PrevDate" value="@Model.PrevDate" />
+    <input id="booking-timeslot" type="hidden" asp-for="TimeSlot" />
+    <input id="booking-date" type="hidden" asp-for="Date" />
+</form>
+
+@section scripts
+    {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+
+
+    @* template used when adding additional passengers dynamically *@
+    <template id="add-passenger-template">
+        <div class="additional-passenger">
+            <input type="hidden" name="AdditionalPassengers.Index" value="--index--" />
+
+            <div class="form-group">
+                <label class="small">
+                    Name of additional passenger
+                </label>
+                <div class="row">
+                    <div class="col-sm-5 col-xs-8">
+                        <input type="text" name="AdditionalPassengers[--index--].Name" class="form-control" placeholder="Please enter the passenger name" value="" />
+                    </div>
+                    <div class="info col-sm-7 col-xs-4">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="small">
+                    Weight of additional passenger (in kg)
+                </label>
+                <div class="row">
+                    <div class="col-sm-5 col-xs-8">
+                        <input type="text" name="AdditionalPassengers[--index--].Weight" class="form-control" placeholder="Please enter the passenger weight" value="" />
+                    </div>
+                    <div class="info col-sm-7 col-xs-4">
+                        <button class="btn remove-passenger-button" type="button">Remove</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+
+
+
+    <script>
+
+
+        var addPassengerService = 1000;
+        var addPassengerButton = document.getElementById("add-passenger-button");
+        var addPassengerMarker = document.getElementById("add-passenger-marker");
+        var addPassengerTemplate = document.getElementById("add-passenger-template");
+        $(addPassengerButton).on("click", function () {
+            var addPassengerHtml = $(addPassengerTemplate).html();
+            addPassengerHtml = addPassengerHtml.replace(/\-\-index\-\-/g, '' + addPassengerService)
+            addPassengerService++;
+
+            $(addPassengerHtml).insertBefore(addPassengerMarker);
+            //updateCalender();
+        });
+
+        $(document).on("click", ".remove-passenger-button", function (e) {
+            $(e.target).closest(".additional-passenger").remove();
+            //updateCalender();
+        });
+
+
+
+
+    </script>
+
+}

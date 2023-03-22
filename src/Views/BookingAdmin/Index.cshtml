@@ -1,0 +1,40 @@
+@using TandemBooking.Services
+@model List<Booking>
+@{
+    ViewData["Title"] = "Booked flights";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <ul class="nav navbar-nav">
+        <li class=""><a href="@Url.Action("Create")">New Booking</a></li>
+        @if (User.IsAdmin())
+        {
+            <li><a href="@Url.Action("CompletedBookings", "Report")">Completed bookings</a></li>
+            <li><a href="@Url.Action("BookingsByPilot", "Report")">Completed bookings per pilot</a></li>
+        }
+    </ul>
+</div>
+
+<table class="table">
+    <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Passenger</th>
+        <th>Phone</th>
+        <th>Pilot</th>
+        <th></th>
+    </tr>
+    @foreach (var booking in Model)
+    {
+    <tr class="@(booking.BookingDate < DateTime.Now.Date ? "booking-past" : "") @(booking.Canceled ? "booking-canceled" : "")">
+        <td>@booking.BookingDate.ToString("dd.MM.yyyy")</td>
+        <td>@booking.TimeSlot.asTime()</td>
+        <td>@booking.PassengerName</td>
+        <td>@booking.PassengerPhone</td>
+        <td>@(booking.AssignedPilot?.Name ?? "No pilot assigned")</td>
+        <td><a href="@Url.Action("Details", new { id = booking.Id })" class="btn btn-default">Details</a></td>
+    </tr>
+    }
+</table>

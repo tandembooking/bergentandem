@@ -1,0 +1,218 @@
+@using System.Security.Claims
+@using TandemBooking.ViewModels.AvailabilityOverview
+@using TandemBooking.Services
+@model AvailabilityOverviewViewModel
+
+@{
+    ViewData["Title"] = $"Availability Overview";
+}
+
+<style>
+    .nothing{
+        background-color: lightgray
+    }
+    .available {
+        background-color: lightgreen;
+    }
+
+    .booked {
+        background-color: lightyellow;
+    }
+
+    .unavailable {
+        background-color: lightsalmon;
+    }
+
+    .table {
+        background-color: white;
+    }
+
+    .past {
+        opacity: 0.8;
+    }
+
+    .pilot-availability a {
+        color: inherit;
+    }
+
+    .day {
+        
+    }
+</style>
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    Overview of how pilot availability by day
+</p>
+
+<div class="row">
+    <div class="col-xs-2">
+        <h2><a href="@Url.Action("Index", new {date = Model.Prev.Date})">&lt;</a></h2>
+    </div>
+    <div class="col-xs-8 text-center">
+        <h2>@Model.MonthName</h2>
+    </div>
+    <div class="col-xs-2 text-right">
+        <h2><a href="@Url.Action("Index", new {date = Model.Next.Date})">&gt;</a></h2>
+    </div>
+</div>
+
+<table I id="calender" class="table table-bordered pilot-availability" style="width: 100%; table-layout: fixed;">
+    <tr>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+        <th>Sun</th>
+    </tr>
+    @{
+        int dayIndex = 0;
+    }
+    @while (dayIndex < Model.Days.Count)
+    {
+        <tr>
+            @for (int weekDay = 0; weekDay < 7 && dayIndex < Model.Days.Count; weekDay++)
+            {
+                var dayInfo = Model.Days[dayIndex];
+                int totalFree = 0;
+                int totalBookings = 0;
+                int totalUnassigned = 0;
+                int maxFree = 0;
+                int maxFreeTimeSlot = -1;
+                @foreach (var timeslot in dayInfo.TimeSlots)
+                {
+                    if (timeslot.FreePilots.Count > maxFree)
+                    {
+                        maxFree = timeslot.FreePilots.Count;
+                        maxFreeTimeSlot = timeslot.TimeSlot;
+
+                    }
+                    totalFree += timeslot.FreePilots.Count;
+                    totalBookings += timeslot.PilotBookings.Count;
+                    totalUnassigned += timeslot.UnassignedBookings.Count;
+                }
+                bool available = totalFree > 0;
+                bool booked = totalBookings > 0 && !available;
+
+                <text>
+                <td class="@(available ? "available" : "")@( booked ? "booked":"") @( totalUnassigned > 0 ? "unavailable":"") day" onclick="show_times(this)" style="position: relative; height: 50px">
+                    <div class="day">@dayInfo.Date.Day</div>
+
+                    @foreach (var timeslot in dayInfo.TimeSlots)
+                    {
+                        string pilots = "";
+                        foreach(var availability in timeslot.FreePilots)
+                        {
+                            pilots += availability.Pilot.Name + "<br>";
+
+                        }
+                        <div class="timeslot-data" style="display:none"
+                             data-timeslot="@timeslot.TimeSlot"
+                             data-availabilities="@timeslot.Availabilities.Count"
+                             data-assigned="@timeslot.PilotBookings.Count"
+                             data-unassigned="@timeslot.UnassignedBookings.Count"
+                             data-free="@timeslot.FreePilots.Count"
+                             data-pilotList="@pilots">
+                        </div>
+                    }
+                    <div>@totalFree free slots</div>
+                    <div>@totalBookings assigned bookings</div>
+                    <div>@totalUnassigned unassigned bookings</div>
+                    @if (maxFree > 0)
+                    {
+                        <div>@maxFree free pilots at @maxFreeTimeSlot.asTime() </div>
+                    }
+
+
+                </td>
+                </text>
+                dayIndex++;
+            }
+        </tr>
+    }
+</table>
+
+<div id="day-details" class="row" style="display:none">
+
+    <div class="timeslots col-md-10 col-sm-12 col-lg-6">
+        Select time:
+        <br />
+        @for (int timeslot = 0; timeslot < 5; timeslot++)
+        {
+            <div id="timeslot:@timeslot"  onclick="select_slot(@timeslot)"> 
+                <div class="row">
+                    <div class="col-md-2">
+                        @timeslot.asTime()
+                    </div>
+                    <div class="col-md-4" id="details:@timeslot">
+
+                    </div>
+                    <div class="col-md-4" id="pilots:@timeslot">
+
+                    </div>
+
+                </div>
+            </div>
+
+        }
+    </div>
+</div>
+
+<script>
+    var dayDetails = document.getElementById("day-details");
+  
+
+    function show_times(currentDay) {
+        dayDetails.style.display = "block";
+
+        var dayElements = document.getElementById("calender").getElementsByClassName("day");
+
+        for (var i = 0; i < dayElements.length; i++) {
+            dayElements[i].classList.remove("highlight");
+        }
+
+        var dataElements = currentDay.getElementsByClassName("timeslot-data");
+
+        currentDay.classList.add("selected");
+        currentDay.classList.add("highlight");
+
+        
+        for (var i = 0; i < dataElements.length; i++) {
+            
+            var activePilots = Number(dataElements[i].getAttribute("data-availabilities"));
+            var assignedBookings = Number(dataElements[i].getAttribute("data-assigned"));
+            var unassignedBookings = Number(dataElements[i].getAttribute("data-unassigned"));
+            var freePilots = Number(dataElements[i].getAttribute("data-free"));
+            var pilots = dataElements[i].getAttribute("data-pilotList");
+
+            var className = "";
+            className += freePilots > 0 ? "available" : "";
+            className += unassignedBookings > 0 ? "unavailable" : "";
+            
+            var timeslotElement = document.getElementById("timeslot:" + i);
+            timeslotElement.classList = className;
+
+            var timeslotDetails = document.getElementById("details:" + i);
+            timeslotDetails.innerHTML = "" +
+                activePilots + " active pilots <br>" +
+                freePilots + " free pilots <br>" +
+                assignedBookings + " assigned bookings <br>" +
+                unassignedBookings + " unassigned bookings";
+            
+            var timeslotPilots = document.getElementById("pilots:" + i);
+            timeslotPilots.innerHTML = pilots;
+        }
+        
+
+
+    }
+    function postAvailability(url) {
+        $.post(url, {}, function () {
+            window.location.reload();
+        });
+    }
+
+</script>

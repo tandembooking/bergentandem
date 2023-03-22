@@ -1,0 +1,68 @@
+@model IndexViewModel
+@{
+    ViewData["Title"] = "Manage your account";
+}
+
+<h2>@ViewData["Title"].</h2>
+<p class="text-success">@ViewData["StatusMessage"]</p>
+<div>
+    <h4>Change your account settings</h4>
+    <hr />
+    <form asp-action="UpdateNotifications" method="post" class="form">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="col-md-3 control-label">Password</label>
+                <div class="col-md-9">
+                    <div class="form-control-static">
+                        @if (Model.HasPassword)
+                        {
+                            <a asp-controller="Manage" asp-action="ChangePassword">Change Password</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Manage" asp-action="SetPassword">Set Password</a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-3 control-label">Notifications</label>
+                <div class="col-md-9">
+                    <div class="checkbox">
+                        <input asp-for="EmailNotification" style="margin-left: 0" />
+                        <label asp-for="EmailNotification"></label>
+                    </div>
+
+                    <div class="checkbox">
+                        <input asp-for="SmsNotification" style="margin-left: 0" />
+                        <label asp-for="SmsNotification"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MinPassengerWeight" class="col-md-3 control-label"></label>
+                <div class="col-md-9">
+                    <input asp-for="MinPassengerWeight" class="form-control" />
+                    <span asp-validation-for="MinPassengerWeight" class="text-danger" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MaxPassengerWeight" class="col-md-3 control-label"></label>
+                <div class="col-md-9">
+                    <input asp-for="MaxPassengerWeight" class="form-control" />
+                    <span asp-validation-for="MaxPassengerWeight" class="text-danger" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-3 control-label"></div>
+                <div class="col-md-9">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

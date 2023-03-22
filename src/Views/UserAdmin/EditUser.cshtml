@@ -1,0 +1,65 @@
+@model ApplicationUser
+@{
+    ViewData["Title"] = string.IsNullOrEmpty(Model.Name) ? "Edit User" : Model.Name;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <section>
+            <form asp-controller="UserAdmin" asp-action="EditUser" method="post" class="form-horizontal" role="form">
+                <input type="hidden" asp-for="Id"/>
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="Name" class="col-md-2 control-label">Name</label>
+                    <div class="col-md-10">
+                        <input asp-for="Name" class="form-control"/>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="col-md-2 control-label">Email</label>
+                    <div class="col-md-10">
+                        <input asp-for="Email" class="form-control"/>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PhoneNumber" class="col-md-2 control-label">Phone</label>
+                    <div class="col-md-10">
+                        <input asp-for="PhoneNumber" class="form-control"/>
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox checkbox-inline">
+                            <input asp-for="IsPilot"/>
+                            <label asp-for="IsPilot">Tandem Pilot</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox checkbox-inline">
+                            <input asp-for="IsAdmin"/>
+                            <label asp-for="IsAdmin">Admin</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <button type="submit" class="btn btn-default">Save</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>

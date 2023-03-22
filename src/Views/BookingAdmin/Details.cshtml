@@ -1,0 +1,235 @@
+@using TandemBooking.Services
+@model TandemBooking.ViewModels.BookingAdmin.BookingDetailsViewModel
+@{
+    ViewData["Title"] = "Booking Details";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="clearfix">
+    <ul class="nav navbar-nav">
+        @if ((!Model.Booking.Canceled && !Model.Booking.Completed) || User.IsAdmin())
+        {
+            <li class=""><a class="" href="@Url.Action("Edit", new { id=Model.Booking.Id })">Edit Booking Details</a></li>
+            <li class=""><a class="" href="@Url.Action("AssignPilot", new { id=Model.Booking.Id })">Assign Pilot</a></li>
+            <li class=""><a class="" href="@Url.Action("Cancel", new { id=Model.Booking.Id })">Cancel Booking</a></li>
+            <li class=""><a class="" href="@Url.Action("Complete", new { id=Model.Booking.Id })">Complete Booking</a></li>
+        }
+        <li class=""><a class="" href="@Url.Action("Create", new { cloneBookingId = Model.Booking.Id })">Clone Booking</a></li>
+    </ul>
+</div>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <section>
+            <h3>Booking Info</h3>
+            <form asp-controller="Admin" asp-action="Details" method="post" class="form-horizontal" role="form">
+                <input type="hidden" asp-for="Booking.Id" />
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="Booking.BookingDate" class="col-sm-4 control-label">Booked Date</label>
+                    <div class="col-sm-8 control-text">
+                        @Model.Booking.BookingDate.ToString("dd.MM.yyyy")
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Booking.TimeSlot" class="col-sm-4 control-label">Time</label>
+                    <div class="col-sm-8 control-text">
+                        @Model.Booking.TimeSlot.asTime()
+                    </div>
+                </div>
+
+                @*<div class="form-group">
+            <label asp-for="Booking.BookingDate" class="col-sm-4 control-label">Registration Date</label>
+            <div class="col-sm-8 control-text">
+                @Model.Booking.DateRegistered.ToString("dd.MM.yyyy HH:mm")
+            </div>
+        </div>*@
+
+                <div class="form-group">
+                    <label asp-for="Booking.BookingDate" class="col-sm-4 control-label">Status</label>
+                    <div class="col-sm-8 control-text">
+                        @(Model.Booking.Canceled ? "Canceled" : Model.Booking.Completed ? "Completed" : "Registered")
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Booking.PassengerName" class="col-sm-4 control-label">Passenger</label>
+                    <div class="col-sm-8 control-text">
+                        @Model.Booking.PassengerName
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Booking.PassengerName" class="col-sm-4 control-label">Passenger Weight</label>
+                    <div class="col-sm-8 control-text">
+                        @Model.Booking.PassengerWeight.AsWeight()
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Booking.PassengerPhone" class="col-sm-4 control-label">Passenger Phone</label>
+                    <div class="col-sm-8 control-text">
+                        @Model.Booking.PassengerPhone.AsPhoneNumber()
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Booking.PassengerEmail" class="col-sm-4 control-label">Passenger Email</label>
+                    <div class="col-sm-8 control-text">
+                        @Model.Booking.PassengerEmail
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Booking.PassengerFee" class="col-sm-4 control-label">Passenger Fee</label>
+                    <div class="col-sm-8 control-text">
+                        kr @Model.Booking.PassengerFee.ToString("g0")
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Booking.Comment" class="col-sm-4 control-label">Passenger Comment</label>
+                    <div class="col-sm-8 control-text">
+                        @Model.Booking.Comment
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Booking.AssignedPilot" class="col-sm-4 control-label">Assigned Pilot</label>
+                    <div class="col-sm-8 control-text">
+                        @if (Model.Booking.AssignedPilot != null)
+            {
+                <text>@Model.Booking.AssignedPilot?.Name (@Model.Booking.AssignedPilot.PhoneNumber.AsPhoneNumber())</text>
+}
+else
+{
+            <text>No pilot assigned</text>
+}
+                    </div>
+                </div>
+
+                @if (Model.Booking.PrimaryBooking != null)
+    {
+            <div class="form-group">
+                <label class="col-sm-4 control-label">Linked bookings</label>
+                <div class="col-sm-8 control-text">
+                    <p>
+                        This booking is in a group of @(1 + Model.Booking.PrimaryBooking.AdditionalBookings.Count) bookings. Please coordinate time and place with the pilot of the <a href="@Url.Action("Details", new { Id = Model.Booking.PrimaryBooking.Id })">primary booking</a>:
+                        @(Model.Booking.PrimaryBooking.AssignedPilot != null
+                          ? $"{Model.Booking.PrimaryBooking.AssignedPilot.Name} ({Model.Booking.PrimaryBooking.AssignedPilot.PhoneNumber.AsPhoneNumber()})"
+                          : "pilot will be assigned by booking coordinator")
+                    </p>
+                </div>
+            </div>
+
+}
+
+                @if (Model.Booking.AdditionalBookings.Any())
+    {
+            <div class="form-group">
+                <label class="col-sm-4 control-label">Linked bookings</label>
+                <div class="col-sm-8 control-text">
+                    <p>This is the primary booking in a group of @(1 + Model.Booking.AdditionalBookings.Count) bookings. Please coordinate flight time and place with the primary passenger above and the other pilots below.</p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Passenger</th>
+                                <th>Pilot</th>
+                            </tr>
+                        </thead>
+                        @foreach (var additionalBooking in Model.Booking.AdditionalBookings)
+            {
+                <tr class="@(additionalBooking.Canceled ? "booking-canceled" : "")">
+                    <td>
+                        <a href="@Url.Action("Details", new {Id = additionalBooking.Id})">
+                            @additionalBooking.PassengerName
+                        </a>
+                    </td>
+                    <td>
+                        @if (additionalBooking.AssignedPilot != null)
+            {
+                @additionalBooking.AssignedPilot.Name
+                @("(" + additionalBooking.AssignedPilot.PhoneNumber.AsPhoneNumber() + ")")
+}
+else
+{
+            <text>No pilot assigned</text>
+}
+                    </td>
+                </tr>
+}
+                    </table>
+                </div>
+            </div>
+}
+            </form>
+        </section>
+
+
+        <section>
+            <h3>Booking History</h3>
+            <div class="">
+                <table class="table">
+                    <tr>
+                        <th>Date</th>
+                        <th>Message</th>
+                        <th>User</th>
+                    </tr>
+                    @foreach (var evt in Model.Booking.BookingEvents.OrderBy(e => e.EventDate))
+                    {
+                        <tr>
+                            <td>@evt.EventDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                @evt.EventMessage
+                            </td>
+                            <td>
+                                @if (evt.User != null)
+                                {
+                                    <text>@evt.User.Name (@evt.User.PhoneNumber.AsPhoneNumber()):</text>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </section>
+
+        @if (Model.Editable)
+        {
+            <section>
+                <h3>Add message</h3>
+
+                <div class="col-sm-12">
+                    <p>Add message to the booking and optionally send the message to the passenger</p>
+
+                    <form asp-controller="BookingAdmin" asp-action="AddMessage" class="form">
+                        <input type="hidden" name="Id" value="@Model.Booking.Id"/>
+                        <div class="">
+                            <div>
+                                <textarea class="form-control" id="EventMessage" name="EventMessage" placeholder="Type message to add to booking"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox checkbox-inline">
+                                <input type="checkbox" name="SendToPassenger" id="SendToPassenger" value="true" checked="checked"/>
+                                <label class="control-label" for="SendToPassenger">
+                                    Send message to passenger via SMS
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Add Message</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        }
+    </div>
+</div>

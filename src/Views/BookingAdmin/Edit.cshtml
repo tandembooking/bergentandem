@@ -1,0 +1,103 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@using TandemBooking.Services
+@model TandemBooking.ViewModels.BookingAdmin.EditBookingViewModel
+
+@{
+    ViewData["Title"] = "Edit Booking Details";
+}
+
+<h2>Edit Booking Details</h2>
+
+<form asp-action="Edit">
+    <div class="form-horizontal">
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="BookingDate" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <div id="datepicker" class="input-width" data-date='@Model.BookingDate.ToString("MM/dd/yyyy")'></div>
+                <input type="hidden" asp-for="BookingDate" class="form-control" />
+                <span asp-validation-for="BookingDate" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="TimeSlot" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="TimeSlot" class="form-control">
+                    @for (int timeslot = 0; timeslot < 5; timeslot++)
+                    {
+                        <option value="@timeslot">@timeslot.asTime()</option>
+
+                    }
+                </select>
+                <span asp-validation-for="TimeSlot" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PassengerName" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="PassengerName" class="form-control" />
+                <span asp-validation-for="PassengerName" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PassengerWeight" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="PassengerWeight" class="form-control" />
+                <span asp-validation-for="PassengerWeight" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PassengerPhone" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="PassengerPhone" class="form-control" />
+                <span asp-validation-for="PassengerPhone" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PassengerEmail" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="PassengerEmail" class="form-control" />
+                <span asp-validation-for="PassengerEmail" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PassengerFee" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="PassengerFee" class="form-control" />
+                <span asp-validation-for="PassengerFee" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a href="@Url.Action("Details", new { id = Model.Id })">Back to Booking Details</a>
+</div>
+
+@section scripts
+{
+    <script>
+        $('#datepicker').datepicker({
+            format: "mm/dd/yyyy",
+            maxViewMode: 2
+        });
+        $('#datepicker').on("changeDate", function () {
+            $('#BookingDate').val(
+                $('#datepicker').datepicker('getFormattedDate')
+            );
+        });
+    </script>
+}

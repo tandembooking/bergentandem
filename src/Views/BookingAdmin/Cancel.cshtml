@@ -1,0 +1,61 @@
+@using TandemBooking.Services
+@model TandemBooking.ViewModels.BookingAdmin.BookingCancelViewModel
+@{
+    ViewData["Title"] = "Cancel Booking";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <section>
+            <div class="col-sm-12">
+                <p>Cancel the booking and send a message to the passenger. Use this if the booking cannot completed be due to weather, passenger not showing up or similar. Do not use this if the booking is moved to another date.</p>
+                <p>The passenger will receive a message on the form: "Unfortunately your flight on @Model.Booking.BookingDate.ToString("dd.MM.yyyy") has been canceled due to {cancel-message}"</p>
+                <form asp-controller="BookingAdmin" asp-action="Cancel" method="post" role="form" onsubmit="return submitCancel()">
+                    <input type="hidden" name="Id" value="@Model.Booking.Id"/>
+                    <div class="form-group">
+                        <textarea class="form-control" id="CancelMessage" name="CancelMessage" placeholder="Please enter reason to cancel flight"></textarea>
+                    </div>
+                    <p>
+                        You can uncheck the "send message to passenger" to skip notifying the passenger about the canceled booking. E.g when you are canceling a double booking.
+                    </p>
+                    <div class="form-group">
+                        <div class="checkbox checkbox-inline">
+                            <input type="checkbox" name="NotifyPassenger" id="NotifyPassenger" value="true" checked="checked" />
+                            <label class="control-label" for="NotifyPassenger">
+                                Send message to passenger via SMS
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-danger">Cancel Booking</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+        <div>
+            <a href="@Url.Action("Details", new { id = Model.Booking.Id })">Back to Booking Details</a>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        function submitCancel() {
+            if ($("#CancelMessage").val() == "") {
+                alert("Please enter a message explaining why the flight was canceled");
+                return false;
+            }
+
+            return confirm("Really cancel the flight?");
+        }
+    </script>
+}
