@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: [self-hosted, vossatandem-web]
-    environment: voss-test
+    environment: deploy
     env:
       DEPLOY_TARGET_PATH: ${{ secrets.DEPLOY_TARGET_PATH }}
     steps:
