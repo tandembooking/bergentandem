@@ -3,6 +3,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
@@ -12,14 +13,12 @@ namespace TandemBooking
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            return new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
+            return Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     var hostingEnvironment = hostingContext.HostingEnvironment;
@@ -44,30 +43,26 @@ namespace TandemBooking
                         config.AddCommandLine(args);
                     }
                 })
+                .ConfigureServices(services =>
+                {
+                    services.AddApplicationInsightsTelemetry();
+                })
                 .ConfigureLogging((hostingContext, logging) =>
                 {
                     Log.Logger = new LoggerConfiguration()
                         .ReadFrom.Configuration(hostingContext.Configuration)
                         .Enrich.FromLogContext()
-                        .WriteTo.LiterateConsole()
-                        .WriteTo.Trace()
-                        .WriteTo.RollingFile("log/tandembooking-{Date}.log")
+                        .WriteTo.Console()
+                        .WriteTo.File($"log/tandembooking-{{Date}}.log", shared: true, rollingInterval: RollingInterval.Day)
                         .CreateLogger();
 
                     logging.AddSerilog();
                 })
-                .UseIISIntegration()
-                .UseDefaultServiceProvider(
-                    (context, options) =>
-                    {
-                        options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
-                    })
-                .UseStartup<Startup>()
-                .ConfigureServices((ctx, svc) =>
+                .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    svc.AddApplicationInsightsTelemetry(ctx.Configuration);
-                })
-                .Build();
+                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseSerilog();
+                });
         }
     }
 }
