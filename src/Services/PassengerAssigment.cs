@@ -21,7 +21,7 @@ public class PassengerAssigment
 
 		public Node(string n)
 		{
-			name = name;
+			name = n;
 		}
 	}
 

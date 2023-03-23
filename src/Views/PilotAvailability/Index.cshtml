@@ -47,58 +47,6 @@
     </div>
 </div>
 
-<table class="table table-bordered pilot-availability" style="width: 100%;display:none; table-layout: fixed;">
-    <tr>
-        <th>Mon</th>
-        <th>Tue</th>
-        <th>Wed</th>
-        <th>Thu</th>
-        <th>Fri</th>
-        <th>Sat</th>
-        <th>Sun</th>
-    </tr>
-    @{
-        int day = 0;
-    }
-    @while (Model.StartDate.AddDays(day) <= Model.EndDate)
-    {
-        <tr>
-            @for (int weekDay = 0; weekDay < 7; weekDay++)
-            {
-                var date = Model.StartDate.AddDays(day);
-                var isAvailable = Model.Availabilities.Any(a => a.Date == date);
-                var timeSlots = Model.Availabilities.Where(a => a.Date == date).OrderBy(a => a.TimeSlot);
-
-                var inPast = date < DateTime.Now.Date;
-
-                <td class="@(isAvailable ? "available" : "unavailable") @(inPast ? "past" : "future")" style="position: relative; height: 50px">
-
-
-
-                    @if (!inPast)
-                    {
-                        var url = Url.Action("SetAvailabilityDay", new { date = date, available = !isAvailable, userId = Model.Pilot.Id });
-
-                        <a style="display: block; width: 100%; height: 100%" href="@url" onclick="postAvailability('@url'); return false">
-                            @date.Day
-                            @timeSlots.Count();
-                        </a>
-
-                    }
-                    else
-                    {
-                        @date.Day
-                    }
-                </td>
-
-                {
-                    day++;
-                }
-            }
-        </tr>
-    }
-</table>
-
 <table class="table table-bordered pilot-availability" style="width: 100%; table-layout: fixed;">
     <tr>
         <th>Mon</th>
@@ -110,7 +58,7 @@
         <th>Sun</th>
     </tr>
     @{
-        day = 0;
+        int day = 0;
     }
     @while (Model.StartDate.AddDays(day) <= Model.EndDate)
     {
@@ -246,11 +194,11 @@
 
 
     function sendData() {
-
+            console.log(jsonInput);
             $.ajax({
                 type: "POST",
                 url: "/NO/PilotAvailability/SetAvailability",
-                contentType: "application/json",
+                contentType: "application/json; charset=utf-8",
                 data: JSON.stringify(jsonInput) ,
                 success: function (msg) {
                     jsonInput = [];
@@ -258,11 +206,6 @@
                 }
             });
 
-    }
-    function postAvailability(url) {
-        $.post(url, {}, function () {
-            window.location.reload();
-        });
     }
     $(".timeslot").click(function (e) {
         e.stopPropagation();

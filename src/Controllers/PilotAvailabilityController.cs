@@ -92,7 +92,7 @@ namespace TandemBooking.Controllers
             });
         }
 
-        
+
          [HttpPost]
         async public Task<ActionResult> SetAvailability([FromBody]  SetPilotAvailabilityViewModel[] availabilities)
         {

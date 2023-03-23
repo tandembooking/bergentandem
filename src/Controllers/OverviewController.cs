@@ -37,11 +37,12 @@ namespace TandemBooking.Controllers
 
                 result.CorrespondingBookings = _context.Bookings
                     .Include(b => b.AssignedPilot)
+                    .AsNoTracking()
                     .Where(b => !b.Canceled)
                     .Where(b => b.AssignedPilot != null)
-                    .Where(b => result.MissingPilotBookings.Any(c => c.BookingDate == b.BookingDate))
+                    .Where(b => b.AssignedPilotId != _userManager.GetUserId(User))
                     .ToList();
-           
+
                 result.UpcomingBookings = _context.Bookings
                     .Include(b => b.AssignedPilot)
                     .AsNoTracking()

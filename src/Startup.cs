@@ -1,3 +1,7 @@
+using System;
+using System.Globalization;
+using System.Runtime.InteropServices.ComTypes;
+using System.Threading;
 using Fujiy.ApplicationInsights.AspNetCore.SqlTrack;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Builder;
@@ -5,13 +9,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using System;
-using System.Globalization;
 using TandemBooking.Models;
 using TandemBooking.Services;
 using TandemBooking.Attributes;
+
 
 namespace TandemBooking
 {
@@ -39,65 +43,42 @@ namespace TandemBooking
             services.AddTandemBookingAuthentication();
             services.AddTandemBookingAuthorization();
             services.AddMvc();
-            services.AddTransient<ContentService>();
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
+
             // Add configuration services.
-            services.AddTransient(provider => new BookingCoordinatorSettings
-            {
-                Name = Configuration["BookingCoordinator:Name"],
-                PhoneNumber = Configuration["BookingCoordinator:PhoneNumber"],
-                Email = Configuration["BookingCoordinator:Email"],
-                DefaultPassengerFee = int.Parse(Configuration["BookingCoordinator:DefaultPassengerFee"])
-            });
-
-            services.AddTransient(provider => new NexmoSettings
-            {
-                Enable = Configuration["Nexmo:Enable"] == "True",
-                ApiKey = Configuration["Nexmo:ApiKey"],
-                ApiSecret = Configuration["Nexmo:ApiSecret"]
-            });
-
-            services.AddTransient(provider => new MailSettings
-            {
-                Enable = Configuration["Mail:Enable"] == "True",
-                SmtpUser = Configuration["Mail:SmtpUser"],
-                SmtpPassword = Configuration["Mail:SmtpPassword"],
-                SmtpServer = Configuration["Mail:SmtpServer"],
-                SmtpPort = int.Parse(Configuration["Mail:SmtpPort"]),
-                FromName = Configuration["Mail:FromName"],
-                FromAddress = Configuration["Mail:FromAddress"]
-            });
+            services.AddTransient(provider => Configuration.GetSection("BookingCoordinator").Get<BookingCoordinatorSettings>());
+            services.AddTransient(provider => Configuration.GetSection("Nexmo").Get<NexmoSettings>());
+            services.AddTransient(provider => Configuration.GetSection("Mail").Get<MailSettings>());
+            // services.AddTransient(provider => Configuration.GetSection("IZettle").Get<IZettleSettings>());
+            // services.AddTransient(provider => Configuration.GetSection("Vipps").Get<VippsSettings>());
 
             //add implementations of mail and nexmo services, which does communication with the outside world
             //they are interfaced because we want to provide different implementations for testing
             services.AddTransient<IMailService, MailService>();
             services.AddTransient<INexmoService, NexmoService>();
-
-            services.AddBookingServices();
-     
+            // services.AddSingleton<IZettleService>();
+            // services.AddSingleton<VippsService>();
             
+            services.AddBookingServices();
             services.AddScoped<LocalizationAttribute>();
+            services.AddControllersWithViews().AddNewtonsoftJson();
 
-            //services.AddMvc(options =>
-            //{
-            //    options.Filters.Add(new LocalizationAttribute());
-            //});
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             ILoggerFactory loggerFactory,
-            IApplicationLifetime appLifetime,
+            IHostApplicationLifetime appLifetime,
             TelemetryClient telemetryClient
         )
         {
             //Force en-US culture to avoid date formatting issues in requests
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
             CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
-
-
 
             //Add EF Core Application Insights
             loggerFactory.AddProvider(new AiEfCoreLoggerProvider(telemetryClient));
@@ -150,29 +131,19 @@ namespace TandemBooking
             }
 
             app.UseStaticFiles();
+            app.UseRouting();
             app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseCors();
 
-            //app.UseMvc(routes =>
-            //{
-            //    routes.MapRoute(
-            //        "default",
-            //        "{lang}/{controller=Home}/{action=Index}/{id?}");
-            //});
-
-            
-
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                        "default",
-                        "{lang=no}/{controller=Home}/{action=Index}/{id?}");
-                routes.MapRoute(
-                        "old",
-                        "{controller=Home}/{action=Index}/{id?}");
+                //endpoints.MapRazorPages();
+                endpoints.MapBlazorHub();
+                endpoints.MapControllerRoute("default", "{lang=no}/{controller=Home}/{action=Index}/{id?}");
+                //endpoints.MapFallbackToController("Index", "Controller");
+                endpoints.MapFallbackToPage("admin/{*path}", "/_Host");
             });
-
-            
-
         }
     }
 }
