@@ -256,7 +256,7 @@ namespace TandemBooking.Controllers
                     PassengerName = passenger.Name,
                     PassengerWeight = passenger.Weight,
                     PassengerPhone = phoneNumber,
-                    PassengerFee = _bookingCoordinatorSettings.DefaultPassengerFee,
+                    PassengerFee = _contentService.content.booking.info.price.value,
                     Comment = $"{input.Comment}, {commentExtra}",
                     BookingEvents = new List<BookingEvent>(),
                 };

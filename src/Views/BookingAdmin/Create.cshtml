@@ -2,7 +2,11 @@
 @using Microsoft.AspNetCore.Mvc.ViewFeatures
 @using TandemBooking.Services
 @model TandemBooking.ViewModels.BookingAdmin.CreateBookingViewModel
-
+@inject ContentService contService;
+@{
+    string lang = ViewContext.RouteData.Values["lang"].ToString();
+    contService.setLanguage(lang);
+}
 @{
     ViewData["Title"] = "Create";
 }
@@ -102,7 +106,7 @@ else
         <div class="form-group">
             <label asp-for="PassengerFee" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="PassengerFee" class="form-control" />
+                <input asp-for="PassengerFee" class="form-control" value="@contService.content.booking.info.price.value" />
                 <span asp-validation-for="PassengerFee" class="text-danger" />
             </div>
         </div>
