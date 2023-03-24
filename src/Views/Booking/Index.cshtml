@@ -119,7 +119,7 @@
     @* add additional passengers on a postback with invalid model *@
 
     @{
-        Html.RenderPartial("PassengerInfo", Model);
+        await Html.RenderPartialAsync("PassengerInfo", Model);
     }
     @if (Model.Stage == 0)
     {
@@ -128,12 +128,12 @@
 
     @if (Model.Stage == 1)
     {
-        Html.RenderPartial("Calender", Model);
+        await Html.RenderPartialAsync("Calender", Model);
         <input id="booking-stage" type="hidden" asp-for="Stage" value="2" />
     }
     @if (Model.Stage == 2)
     {
-        Html.RenderPartial("ContactInfo", Model);
+        await Html.RenderPartialAsync("ContactInfo", Model);
         <input id="booking-stage" type="hidden" asp-for="Stage" value="3" />
     }
 
