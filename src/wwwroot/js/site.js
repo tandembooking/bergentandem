@@ -7,8 +7,7 @@ var dh = dh || {};
                 "/images/bg1.jpg",
                 "/images/bg3.jpg",
                 "/images/bg4.jpg",
-                "/images/bg5.jpg",
-                "/images/bg6.jpg"
+                "/images/bg5.jpg"
             ], { duration: 4000, fade: 500 });
         });
     }

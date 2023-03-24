@@ -86,8 +86,7 @@ body.home .container.body-content {
 }
 body.home .middlebar {
   width: auto;
-  margin-top: 40%;
-  
+  margin-top: 40vh;
   border-radius: 0;
   background: rgba(0, 0, 0, 0.4);
   color: #fff;
