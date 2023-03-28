@@ -189,18 +189,13 @@ namespace TandemBooking.Controllers
             {
                 passengers = new List<AdditionalPassengerViewModel>();
             }
-        
             if (Action.Contains("next_month"))
             {
-
                 input.Calender = UpdateBookingCalendar(passengers, input.NextDate ?? DateTime.UtcNow);
-                
             }
             else if (Action.Contains("prev_month"))
             {
-
                 input.Calender = UpdateBookingCalendar(passengers, input.PrevDate ?? DateTime.UtcNow);
-                
             }
             else
             {
@@ -213,9 +208,16 @@ namespace TandemBooking.Controllers
         }
         private async Task<ActionResult> CreateBooking(BookingViewModel input)
         {
-
-
             var phoneNumber = await _nexmo.FormatPhoneNumber(input.PhoneNumber);
+            var duplicate_booking = _context.Bookings.Where(b =>
+                b.PassengerPhone == phoneNumber &&
+                b.PassengerEmail == input.Email  &&
+                b.BookingDate == input.Date
+            );
+            if (duplicate_booking.Count() > 0){
+                ModelState.AddModelError("Duplicate booking", "There seem to be a duplicate booking. Please contact booking coordinator if you would like to change it!");
+                return View(input);
+            }
             var additionalPassengers = input.AdditionalPassengers
                 ?.Select((a, i) => new
                 {
