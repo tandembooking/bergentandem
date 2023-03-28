@@ -80,8 +80,10 @@ namespace TandemBooking.Controllers
             var userId = _userManager.GetUserId(User);
             var pilot = _context.Users.Single(u => u.Id == userId);
             _bookingService.AssignNewPilot(booking, pilot);
+            _context.SaveChanges();
             var bookingDateString = booking.BookingDate.ToString("dd.MM.yyyy") + " at " + booking.TimeSlot.asTime();
             await _messageService.SendNewPilotMessage(bookingDateString, booking, true);
+
             return RedirectToAction("");
         }
 
