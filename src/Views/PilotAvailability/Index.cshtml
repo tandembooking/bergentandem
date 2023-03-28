@@ -97,8 +97,9 @@
                                 var isSlotAvailable = timeSlots.Any(a => a.TimeSlot == timeslot);
                                 var bookingAtTimeslot = bookingsToday.Where(a => a.Booking.TimeSlot == timeslot);
                                 var isSlotFree = bookingAtTimeslot.Count() == 0 && isSlotAvailable;
+                                var isBooked = bookingAtTimeslot.Count() > 0;
 
-                                <div class="timeslot @(!isSlotAvailable ? "unavailable" : "") @(isSlotAvailable &&!isSlotFree? "booked" : "") @(isSlotAvailable && isSlotFree ? "available" : "")" timeslot" style="float:left;margin:3px; border:1px solid #ddd;" onclick="toggleAvailabilityTimeslot(this)" data-date="@date.ToShortDateString()" @(isFree ? "data-available='available'" : "") data-timeslot="@timeslot">
+                                <div class="timeslot @(!isSlotAvailable && !isBooked ? "unavailable" : "") @(isBooked? "booked" : "") @(isSlotAvailable && isSlotFree ? "available" : "")" timeslot" style="float:left;margin:3px; border:1px solid #ddd;" onclick="toggleAvailabilityTimeslot(this)" data-date="@date.ToShortDateString()" @(isFree ? "data-available='available'" : "") data-timeslot="@timeslot">
                                     @timeslot.asTime()
 
                                 </div>
