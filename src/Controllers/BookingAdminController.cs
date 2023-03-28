@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using TandemBooking.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Asn1;
 using TandemBooking.Services;
 using TandemBooking.ViewModels.BookingAdmin;
 
@@ -452,7 +451,7 @@ namespace TandemBooking.Controllers
             var bookingDateString = booking.BookingDate.ToString("dd.MM.yyyy") + " at " + booking.TimeSlot.asTime();
             if (assignedPilot != null)
             {
-                await _messageService.SendNewPilotMessage(bookingDateString, booking, originalPilot, newPilot.NewPilotNotifyPassenger);
+                await _messageService.SendNewPilotMessage(bookingDateString, booking, newPilot.NewPilotNotifyPassenger);
                 if (originalPilot != null)
                 {
                     await _messageService.SendPilotUnassignedMessage(booking, originalPilot);

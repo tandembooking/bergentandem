@@ -83,16 +83,14 @@
                     @booking.PassengerWeight.AsWeight()
                 </td>
                 <td class="text-right">
+                    <a href="@Url.Action("AssignMe", "Overview" , new { id=booking.Id })" class="btn btn-success">Assign Me</a>
                     <a href="@Url.Action("Details", "BookingAdmin" , new { id=booking.Id })" class="btn btn-default">Details</a>
                 </td>
             </tr>
-            
-                
-            
         }
     </table>
     }
-    else 
+    else
     {
         <p>No upcoming bookings without pilots</p>
     }

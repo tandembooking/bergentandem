@@ -228,7 +228,7 @@ Tandem Coordinator
 
         }
 
-        public async Task SendNewPilotMessage(string bookingDateString, Booking booking, ApplicationUser previousPilot, bool notifyPassenger)
+        public async Task SendNewPilotMessage(string bookingDateString, Booking booking, bool notifyPassenger)
         {
             var bookingTimeStamp =
                 booking.BookingDate.ToString("yyyyMMdd") + "T" + booking.TimeSlot.asTime().Replace(":", "") + "00/" +

@@ -32,8 +32,7 @@ namespace TandemBooking
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddEntityFrameworkSqlServer()
-                .AddDbContext<TandemBookingContext>(options =>
+            services.AddDbContext<TandemBookingContext>(options =>
                 {
                     options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]);
                 });
@@ -90,6 +89,7 @@ namespace TandemBooking
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
             }
             else
             {

@@ -15,10 +15,15 @@ namespace TandemBooking.Controllers
     {
         private readonly TandemBookingContext _context;
         private readonly UserManager _userManager;
+        private readonly BookingService _bookingService;
+        private readonly MessageService _messageService;
 
-        public OverviewController(TandemBookingContext context, UserManager userManager)
+        public OverviewController(TandemBookingContext context, BookingService bookingService,
+            MessageService messageService, UserManager userManager)
         {
             _context = context;
+            _bookingService = bookingService;
+            _messageService = messageService;
             _userManager = userManager;
         }
 
@@ -64,5 +69,21 @@ namespace TandemBooking.Controllers
 
             return View(result);
         }
+
+        [HttpGet]
+        public async Task<ActionResult> AssignMe(Guid id)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.AssignedPilot)
+                .Include(b => b.BookingEvents)
+                .FirstOrDefaultAsync(b => b.Id == id);
+            var userId = _userManager.GetUserId(User);
+            var pilot = _context.Users.Single(u => u.Id == userId);
+            _bookingService.AssignNewPilot(booking, pilot);
+            var bookingDateString = booking.BookingDate.ToString("dd.MM.yyyy") + " at " + booking.TimeSlot.asTime();
+            await _messageService.SendNewPilotMessage(bookingDateString, booking, true);
+            return RedirectToAction("");
+        }
+
     }
 }
