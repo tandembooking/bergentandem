@@ -34,12 +34,14 @@ namespace TandemBooking.Controllers
         private readonly TandemBookingContext _context;
         private readonly UserManager _userManager;
         private readonly BookingService _bookingService;
+        private readonly MessageService _messageService;
 
-        public PilotAvailabilityController(TandemBookingContext context, UserManager userManager, BookingService bookingService)
+        public PilotAvailabilityController(TandemBookingContext context, UserManager userManager, BookingService bookingService, MessageService messageService)
         {
             _context = context;
             _userManager = userManager;
             _bookingService = bookingService;
+            _messageService = messageService;
         }
 
         public ActionResult Index(DateTime? date = null, string userId=null)
@@ -105,10 +107,8 @@ namespace TandemBooking.Controllers
                 .Where(a => a.Date == currentDate)
                 .Where(a => a.TimeSlot == availabilities[i].TimeSlot);
 
-                
                 if (availabilities[i].Available && existingAvailabilities.Count() ==0)
                 {
-
                     var pilotAvailability = new PilotAvailability()
                     {
                         Date = currentDate,
@@ -122,14 +122,19 @@ namespace TandemBooking.Controllers
                     if(unassignedBookings.Count() > 0)
                     {
                         _context.SaveChanges();
-                        await _bookingService.AssignNewPilotAsync(unassignedBookings[0]);
+                        var pilot = _context.Users.Single(u => u.Id == availabilities[i].PilotID);
+                        foreach (var booking in unassignedBookings) {
+                            if (pilot.InWeightRange(booking.PassengerWeight)) {
+                                _bookingService.AssignNewPilot(booking, pilot);
+                                var bookingDateString = booking.BookingDate.ToString("dd.MM.yyyy") + " at " + booking.TimeSlot.asTime();
+                                await _messageService.SendNewPilotMessage(bookingDateString, booking, true);
+                                break;
+                            }
+                        }
                     }
-
                 }
                 else if(availabilities[i].Available == false)
                 {
-                    
-
                     foreach (var pilotAvailability in existingAvailabilities)
                     {
                         _context.PilotAvailabilities.Remove(pilotAvailability);
@@ -141,9 +146,5 @@ namespace TandemBooking.Controllers
 
             return Json(new { result = "ok" });
         }
-
-
-        
     }
-
 }

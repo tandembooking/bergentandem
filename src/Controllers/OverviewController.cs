@@ -83,7 +83,6 @@ namespace TandemBooking.Controllers
             _context.SaveChanges();
             var bookingDateString = booking.BookingDate.ToString("dd.MM.yyyy") + " at " + booking.TimeSlot.asTime();
             await _messageService.SendNewPilotMessage(bookingDateString, booking, true);
-
             return RedirectToAction("");
         }
 
