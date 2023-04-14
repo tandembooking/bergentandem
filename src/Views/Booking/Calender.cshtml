@@ -96,13 +96,13 @@
             @Model.Calender.MonthName
         </h2>
     </div>
-    <div class="col-xs-2 text-right">        
+    <div class="col-xs-2 text-right">
         <button class="month-button" type="submit" name="Action" value="calender_next_month"><h2>&gt;</h2></button>
     </div>
 </div>
 
-<table id="bookingcalender" 
-       class="table table-bordered pilot-availability" 
+<table id="bookingcalender"
+       class="table table-bordered pilot-availability"
        style="width: 100%; table-layout: fixed;">
     <tr>
         @foreach (var day in contService.content.booking.calender.days)
@@ -137,31 +137,32 @@
         <text>
         <td class="" style="position: relative; height: 30px;width:30px; padding:0px; border:0px" align="center">
 
-                <div class="day date-wrap @(available ? "date-free" : "date-unavailable")" 
-                     height="100%" 
+                <div class="day date-wrap @(available && dayInfo.Date > DateTime.Today ? "date-free" : "date-unavailable")" 
+                     height="100%"
                      data-maxflow="@maxFree">
 
                     <div style="display:none" id="@dayIndex">
                         @foreach (var timeslot in dayInfo.TimeSlots)  {
-                        <div style="display:none"
-                             data-timeslot="@timeslot.TimeSlot"
-                             data-freepilots="@timeslot.PossibleNow"
-                             data-availablepilots="@timeslot.PossibleNow">
-                        </div>
-                }
+                            <div style="display:none"
+                                data-timeslot="@timeslot.TimeSlot"
+                                data-freepilots="@timeslot.PossibleNow"
+                                data-availablepilots="@timeslot.PossibleNow">
+                            </div>
+                        }
                     </div>
-                    <button class="date-button" 
-                            type="button" 
-                            name="Action" 
-                            value="@dayInfo.Date.ToShortDateString()" 
-                            onclick="show_times(@dayIndex)">
+
+                    <button class="date-button"
+                        type="button"
+                        name="Action"
+                        value="@dayInfo.Date.ToShortDateString()"
+                        disabled="@(dayInfo.Date <= DateTime.Today)"
+                        onclick="show_times(@dayIndex)">
                         @dayInfo.Date.Day
                     </button>
                 </div>
 
 
          </td>
-            
         </text>
                 dayIndex++;
             }
