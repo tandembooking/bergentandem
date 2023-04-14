@@ -1,19 +1,19 @@
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
+using System;
 
 namespace TandemBooking.Tests.TestSetup
 {
     public static class LocalDbTools
     {
+        private static string test_db_conn_str =
+            "Data Source=127.0.0.1,1433;Initial Catalog=tandembooking_test;User ID=sa;Password=Whatare5555;Encrypt=False";
         public static async Task<bool> CheckLocalDbExistsAsync(string databaseName)
         {
             //Create Database
-            var builder = new SqlConnectionStringBuilder
-            {
-                ["Server"] = ".;Initial Catalog=tandembooking_test;user id=sa;password=Whatare5555",
-            };
-            using (var conn = new SqlConnection(builder.ConnectionString))
+
+            using (var conn = new SqlConnection(test_db_conn_str))
             {
                 conn.Open();
 
@@ -32,45 +32,31 @@ namespace TandemBooking.Tests.TestSetup
                 throw new LocalDbException(string.Format("Database {0} already exists", databaseName));
             }
 
-            if (File.Exists(GetLocalDbFilename(databaseName)))
-            {
-                throw new LocalDbException(string.Format("Database File {0} already exists", GetLocalDbFilename(databaseName)));
-            }
 
-            //Create Database
-            var builder = new SqlConnectionStringBuilder();
-            builder["Server"] = ".;Initial Catalog=tandembooking_test;user id=sa;password=Whatare5555";
-            using (var conn = new SqlConnection(builder.ConnectionString))
+            using (var conn = new SqlConnection(test_db_conn_str))
             {
                 conn.Open();
 
                 try
                 {
-                    var cmd = new SqlCommand(string.Format("CREATE DATABASE {0} ON (name='{0}', filename='{1}')", databaseName, GetLocalDbFilename(databaseName)), conn);
-                    await cmd.ExecuteNonQueryAsync();
+                    var create_cmd = new SqlCommand(string.Format("CREATE DATABASE {0}", databaseName), conn);
+                    await create_cmd.ExecuteNonQueryAsync();
+                    //var grant_cmd = new SqlCommand(string.Format("GRANT ALL ON {0} to sa", databaseName), conn);
+                    //await grant_cmd.ExecuteNonQueryAsync();
                 }
                 catch (SqlException ex)
                 {
                     throw new LocalDbException("Unable to create database, " + ex.Message, ex);
                 }
             }
-
-            string connectionString = GetLocalDbConnectionString(databaseName);
-            return connectionString;
+            return test_db_conn_str;
         }
 
-        public static async Task DestroyLocalDbDatabase(string connectionString)
+        public static async Task DestroyLocalDbDatabase(string databaseName)
         {
-            //If connectionstring does not contain an '=' sign, assume it's a database name instead
-            //and build a connectionstring for it
-            if (!connectionString.Contains("="))
-            {
-                connectionString = GetLocalDbConnectionString(connectionString);
-            }
-
+            var connectionString = test_db_conn_str;
             //Get database name
             var builder = new SqlConnectionStringBuilder(connectionString);
-            var databaseName = (string)builder["Database"];
             if (string.IsNullOrEmpty(databaseName))
             {
                 throw new LocalDbException(string.Format("Unable missing 'Database' in connection string '{0}'", connectionString));
@@ -93,22 +79,5 @@ namespace TandemBooking.Tests.TestSetup
                 }
             }
         }
-
-
-        public static string GetLocalDbConnectionString(string databaseName)
-        {
-            var builder = new SqlConnectionStringBuilder();
-            builder["Server"] = ".;Initial Catalog=tandembooking_test;user id=sa;password=Whatare5555";
-            //builder["AttachDbFilename"] = GetLocalDbFilename(databaseName);
-            builder["Database"] = databaseName;
-            return builder.ConnectionString;
-        }
-
-        private static string GetLocalDbFilename(string databaseName)
-        {
-            return string.Format(@"c:\temp\{0}.mdf", databaseName);
-        }
-
-
     }
 }

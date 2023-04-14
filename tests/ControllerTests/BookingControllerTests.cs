@@ -36,7 +36,6 @@ namespace TandemBooking.Tests.ControllerTests
                 Email = "passenger@example.com",
                 Comment = "Blah",
                 TimeSlot = -1,
-                
             };
 
             //act
@@ -139,7 +138,6 @@ namespace TandemBooking.Tests.ControllerTests
             {
                 Date = new DateTime(2016, 11, 1),
                 Name = "My Contact Name",
-                
                 PhoneNumber = "11111111",
                 Email = "passenger@example.com",
                 Comment = "Blah",
@@ -159,7 +157,7 @@ namespace TandemBooking.Tests.ControllerTests
                     },
                     new AdditionalPassengerViewModel
                     {
-                        Name = "Additional2", 
+                        Name = "Additional2",
                         Weight = 90
                     },
                 }
@@ -229,7 +227,7 @@ namespace TandemBooking.Tests.ControllerTests
             //Assert sms is sent
             var nexmoService = (MockNexmoService) GetService<INexmoService>();
 
-            //we should have sent six text messages: 
+            //we should have sent six text messages:
             // - one to passenger
             // - one to each of the two assigned pilots
             // - three to booking coordinator
@@ -275,7 +273,7 @@ namespace TandemBooking.Tests.ControllerTests
             {
                 Date = new DateTime(2016, 11, 1),
                 Name = "My Name",
-                AdditionalPassengers = new AdditionalPassengerViewModel[] 
+                AdditionalPassengers = new AdditionalPassengerViewModel[]
                 {
                     new AdditionalPassengerViewModel
                     {
@@ -288,7 +286,6 @@ namespace TandemBooking.Tests.ControllerTests
                 Comment = "Blah",
                 TimeSlot = 1,
                 Stage = 3,
-                
             };
 
             var ctrl = GetService<BookingController>();
@@ -400,6 +397,5 @@ namespace TandemBooking.Tests.ControllerTests
             var passengerMail = mailService.Messages.Single(m => m.Recipient == "passenger@example.com");
             Assert.Contains("Thank you", passengerMail.Body);
         }
-       
     }
 }

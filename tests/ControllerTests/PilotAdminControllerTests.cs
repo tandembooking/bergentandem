@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TandemBooking.Controllers;
-using TandemBooking.Services;
 using TandemBooking.Tests.TestData;
 using TandemBooking.Tests.TestSetup;
 using TandemBooking.ViewModels;
@@ -26,7 +22,7 @@ namespace TandemBooking.Tests.ControllerTests
 
         private readonly PilotsFixture _pilots;
 
-       
+
         [Fact]
         public async Task AddAvailabilityTest()
         {
@@ -42,11 +38,12 @@ namespace TandemBooking.Tests.ControllerTests
             var ctrlLogin = GetService<AccountController>();
             var resultLogin = await ctrlLogin.Login(loginInfo);
 
-            var input = new PilotAvailabilityViewModel {
+            var input = new PilotAvailabilityViewModel
+            {
                 StartDate = new DateTime(2016, 10, 1),
                 EndDate = new DateTime(2016, 10, 31),
                 Pilot = _pilots.Frode,
-                Next = new DateTime(2016,11,1),
+                Next = new DateTime(2016, 11, 1),
                 Prev = new DateTime(2016, 9, 30),
                 MonthName = "October"
 
@@ -62,15 +59,15 @@ namespace TandemBooking.Tests.ControllerTests
             };
             inputAvail[0] = avail1;
             var ctrl = GetService<PilotAvailabilityController>();
-            ctrl.SetAvailability(inputAvail);
-            ctrl.SetAvailability(inputAvail);
+            await ctrl.SetAvailability(inputAvail);
+            await ctrl.SetAvailability(inputAvail);
 
             var result = ctrl.Index(new DateTime(2016, 10, 13), _pilots.Frode.Id) as ViewResult;
-            var availibility = (PilotAvailabilityViewModel) result.ViewData.Model;
+            var availibility = (PilotAvailabilityViewModel)result.ViewData.Model;
 
             //Assert booking is created
-            Assert.Equal(1, availibility.Availabilities.Count());
-            
+            Assert.Single(availibility.Availabilities);
+
         }
 
     }
