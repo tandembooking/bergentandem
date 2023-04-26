@@ -101,7 +101,7 @@ Booking Coordinator
 
                     //message all pilots of unassigned booking
                     var messageToPilots =
-                        $"Available flight on {bookingDateString} at {booking.TimeSlot.asTime()}: {booking.PassengerName}, {booking.PassengerEmail}, {booking.PassengerPhone.AsPhoneNumber()}, {booking.Comment}";
+                        $"Available flight on {bookingDateString} at {booking.TimeSlot.asTime()}: {booking.PassengerName}, {booking.PassengerEmail}, {booking.PassengerPhone.AsPhoneNumber()}, {booking.PassengerWeight} kg, {booking.Comment}";
                     var allPilots = _context.Users.Where(p => p.IsPilot || p.IsAdmin).ToList();
 
                     foreach (var pilot in allPilots)
