@@ -51,7 +51,7 @@ function Deploy()
     }
     
     echo "Waiting"
-    Start-Sleep -Seconds 2
+    Start-Sleep -Seconds 10
 
     # Replace app
     echo "Removing previous version"
