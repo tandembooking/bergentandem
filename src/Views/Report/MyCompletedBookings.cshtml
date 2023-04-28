@@ -20,15 +20,28 @@
     <button onclick="document.getElementById('report').classList.toggle('hidden')">Show report</button>
     <br />
     <textarea id="report" class="hidden" cols="40" rows="@(Model.Bookings.Where(b=>b.Completed).ToList().Count * 5)">
-    @foreach (var booking in Model.Bookings.Where(b=>b.Completed).ToList())
-    {
+    @{
 
-        @("Dato: " + booking.BookingDate.ToString("dd.MM.yyyy")+ "\n")
-        @("Pilot: " + booking.AssignedPilot?.Name + "\n")
-        @("Passasjer: " + booking.PassengerName + "\n")
-        @("Pris: " + booking.PassengerFee + "\n")
-        @("Betalingsmetode: \n")
-        @("\n")
+        var sum = 0;
+        foreach (var booking in Model.Bookings.Where(b=>b.Completed).ToList())
+        {
+
+            @("Dato: " + booking.BookingDate.ToString("dd.MM.yyyy")+ "\n")
+            @("Pilot: " + booking.AssignedPilot?.Name + "\n")
+            @("Passasjer: " + booking.PassengerName + "\n")
+            @("Pris: " + booking.PassengerFee + "\n")
+            @("Betalingsmetode: \n")
+            @("\n")
+            var club_share = 0;
+            if (booking.PassengerFee == 2000){
+                club_share = 350;
+            }
+            else {
+                club_share = 200;
+            }
+            sum += decimal.ToInt32(booking.PassengerFee) - club_share;
+        }
+        @("Til utbetaling: " + sum)
 
     }
     </textarea>
@@ -41,21 +54,19 @@
         <th>Pilot</th>
         <th></th>
     </tr>
-   
         @foreach (var booking in Model.Bookings)
         {
-            
         <tr>
             <td>@booking.BookingDate.ToString("dd.MM.yyyy")</td>
             <td>@booking.PassengerName</td>
             <td>@(booking.AssignedPilot?.Name ?? "No pilot assigned")</td>
             <td><a href="@Url.Action("Details", "BookingAdmin", new { id = booking.Id })" class="btn btn-default">Details</a></td>
         </tr>
-            }
-        
+        }
+
     <tfoot>
     <tr>
         <th colspan="4">@Model.Bookings.Count Completed Bookings</th>
     </tr>
         </tfoot>
-</table>
+</table>((short)
