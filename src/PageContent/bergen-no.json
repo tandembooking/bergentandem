@@ -98,8 +98,8 @@
         "value": 2000
       },
       "video": {
-        "label": "Ekstra for leige av GoPro-kamera.",
-        "value": 200
+        "label": "Leige av GoPro-kamera.",
+        "value": "Etter avtale med pilot"
 
       },
       "other": "Prisen inkluderer ikke billett på gondolen opp til Ulriken. Alle priser er i norske kroner (NOK)."
@@ -118,7 +118,7 @@
       },
       {
         "Q": "Hvor mye koster det?",
-        "A": "Ordinær pris er 2000 NOK. For video/bilder ved bruk av pilotens eget utstyr kommer det et tillegg på 200 NOK. "
+        "A": "Ordinær pris er 2000 NOK. For video/bilder ved bruk av pilotens, må en avtale med pilot. "
       },
       {
         "Q": "Hvem organiserer tandemparagliding?",
@@ -135,6 +135,18 @@
       {
         "Q": "Hvordan betaler jeg?",
         "A": "Betaling kan gjøres via Vipps eller kontant til piloten samme dag som flyturen. Vi har desverre ikke mulighet for betaling med kort."
+      },
+      {
+        "Q": "Hvor lang tid tar det?",
+        "A": "Flyturen er på rundt 10 minutter. Fra ein møter pilot på toppen til ein lander tar det 1-2 timer."
+      },
+      {
+        "Q": "Hvor er oppmøte?",
+        "A": "Oppmøte er på toppen av Ulriken. Se <a href=\"https://ulriken643.no\"> Ulriken643 </a> for mer informasjon."
+      },
+      {
+        "Q": "Hor lander vi?",
+        "A": "Vi lander på marken rett ved Brann stadion. Se kart: <br> <iframe src=\"https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d2738.738843734533!2d5.355408096287078!3d60.36874631591418!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNjDCsDIyJzA3LjUiTiA1wrAyMScyNy43IkU!5e1!3m2!1sno!2sno!4v1682670714787!5m2!1sno!2sno\" width=\"600\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>"
       }
     ],
     "other": {

@@ -99,7 +99,7 @@
       },
       "video": {
         "label": "Extra for photos/video using the pilots equipment",
-        "value": 200
+        "value": "Ask the pilot"
 
       },
       "other": "Regular price does not include the gondola to Ulriken. Out-of-town surcharge is added when flying from places outside the normal starts around Bergen. All prices are in norwegian kroner and are paid via Vipps or directly to the pilot. All prices are in Norwegian Krone (NOK)"
@@ -118,7 +118,7 @@
       },
       {
         "Q": "How much does it cost?",
-        "A": "Standard fee is 2000 NOK. For video/photo using pilots equipment comes an extra 200 NOK. "
+        "A": "Standard fee is 2000 NOK. For video/photo using pilots equipment, ask the pilot. "
       },
       {
         "Q": "Who organizes tandem paragliding?",
@@ -135,7 +135,18 @@
       {
         "Q": "How do I pay?",
         "A": "Payment is done by cash or the norwegian payment system Vipps at the day of the flight. Unfortunately we are unable to accept credit cards."
-         
+      },
+      {
+        "Q": "How long does it take?",
+        "A": "The flight is around 10 minutes. From meeting the pilot at the top, until you are at the landing is roughly 1-2 hours."
+      },
+      {
+        "Q": "Where do I meet?",
+        "A": "The meeting point is at the top of Ulriken. See <a href=\"https://ulriken643.no/en/\"> Ulriken643 </a> for more information."
+      },
+      {
+        "Q": "Where do we land?",
+        "A": "Landing is on the grass field next to Brann stadion. See map: <br> <iframe src=\"https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d2738.738843734533!2d5.355408096287078!3d60.36874631591418!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNjDCsDIyJzA3LjUiTiA1wrAyMScyNy43IkU!5e1!3m2!1sno!2sno!4v1682670714787!5m2!1sno!2sno\" width=\"600\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>"
       }
     ],
     "other": {
