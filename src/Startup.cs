@@ -141,6 +141,7 @@ namespace TandemBooking
                 //endpoints.MapRazorPages();
                 endpoints.MapBlazorHub();
                 endpoints.MapControllerRoute("default", "{lang=no}/{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute("fallback", "{controller=Home}/{action=Index}/{id?}/{lang=no}");
                 //endpoints.MapFallbackToController("Index", "Controller");
                 endpoints.MapFallbackToPage("admin/{*path}", "/_Host");
             });
