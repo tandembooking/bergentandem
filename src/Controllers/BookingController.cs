@@ -62,9 +62,8 @@ namespace TandemBooking.Controllers
                     {
                         stage-=2;
                     }
-                    
+
                     if (stage == 1) {
-                        
                         if(!ValidatePassengers(input, Action))
                         {
                             input.Stage = 0;
@@ -89,7 +88,6 @@ namespace TandemBooking.Controllers
                             input.Stage = 1;
                             return View(input);
                         }
-                        
                     }
 
                     if (stage == 3)
@@ -101,7 +99,6 @@ namespace TandemBooking.Controllers
                         }
                         else
                         {
-                            
                             ValidatePassengers(input, Action);
                             return View(input);
                         }
@@ -138,9 +135,9 @@ namespace TandemBooking.Controllers
         }
         private async Task<ActionResult> ValidateContact(BookingViewModel input)
         {
-            
+
             //validate phone number
-            var phoneNumber =  await _nexmo.FormatPhoneNumber(input.PhoneNumber);
+            var phoneNumber =  input.PhoneNumber;
             if (phoneNumber == null)
             {
                 ModelState.AddModelError("PhoneNumber", "Please enter a valid phone number");
@@ -269,7 +266,7 @@ namespace TandemBooking.Controllers
             //Assign pilots
             await _bookingService.AssignNewPilotAsync(bookings);
             _context.SaveChanges();
-            
+
             await _messageService.SendNewBookingMessage(bookings[0], bookings.Skip(1).ToArray(), true, true);
             return RedirectToAction("Confirm", new { bookingId = bookings[0].Id });
         }

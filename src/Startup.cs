@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Globalization;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
@@ -6,6 +7,7 @@ using Fujiy.ApplicationInsights.AspNetCore.SqlTrack;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +39,9 @@ namespace TandemBooking
                     options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]);
                 });
 
-            services.AddDataProtection();
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(Configuration["DataProtectionFolder"]));
+
 
             services.AddTandemBookingAuthentication();
             services.AddTandemBookingAuthorization();

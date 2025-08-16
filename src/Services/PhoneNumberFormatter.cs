@@ -7,7 +7,7 @@
             if (string.IsNullOrEmpty(phoneNumber))
                 return phoneNumber;
 
-            return $"+{phoneNumber}";
+            return $"{phoneNumber}";
         }
     }
     public static class TimeSlotFormatter

@@ -99,15 +99,16 @@
 
 </p>
 
+<div id="PhoneError"></div>
+
 @* All of this instead of @Html.ValidationSummary(false) due to a bug in ASP.NET Core 1.0 (probably fixed in 1.1) *@
 @if (!@ViewData.ModelState.IsValid)
 {
     var errors = ViewData.ModelState.Values.Select(item => item.Errors.FirstOrDefault()?.ErrorMessage).Where(item => item != null);
     <div class="alert alert-danger">
-        <ul>
+        <ul id="BookingError">
             @foreach (var error in errors)
             {
-
                 <li>@error</li>
             }
         </ul>
@@ -115,7 +116,7 @@
 }
 
 
-<form id="BookingForm" asp-controller="Booking" asp-action="Index" method="post"  onSubmit="@(Model.Stage == 2 ? "return confirm('Remember to read the FAQ')" : "")">
+<form id="BookingForm" asp-controller="Booking" asp-action="Index" method="post"  >
     @* add additional passengers on a postback with invalid model *@
 
     @{
